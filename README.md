@@ -8,7 +8,8 @@ Eine Android App für den [Online Vertreungsplan des Gymnasium Friedberg](http:/
 
 ## TODO
 
-* Parsen der Website (XmlPullParser)
-* Filter-Algorithmus
+* Parsen der Website (XmlPullParser):
+  * Filter-Algorithmus
+  * Speichern der Einstellungen
 * Authentifizierung
 * Notifications
