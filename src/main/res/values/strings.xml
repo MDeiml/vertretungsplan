@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">MainActivity</string>
+    <string name="app_name">Vertretungsplan</string>
+    <string name="vp_url">http://www.gym-friedberg.de/extscripts/schueler/vertretungsplan/</string>
 </resources>
