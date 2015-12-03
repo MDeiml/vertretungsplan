@@ -3,24 +3,22 @@ package com.mdeiml.vertretungsplan;
 import android.webkit.WebView;
 import android.os.AsyncTask;
 import android.net.Uri;
+import android.widget.Toast;
+import android.content.Context;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.io.IOException;
-import java.io.InputStream;
-import android.util.Xml;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlSerializer;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
 
     private WebView webview;
-    private XmlSerializer serializer;
+    private Context c;
 
-    public UpdateVertretungsplan(WebView webview) {
+    public UpdateVertretungsplan(WebView webview, Context c) {
         this.webview = webview;
+        this.c = c;
     }
 
     @Override
@@ -29,10 +27,28 @@ public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
         try {
             HttpURLConnection connection = (HttpURLConnection)url[0].openConnection();
             connection.setRequestProperty("Authorization", "Basic c2NodWVsZXI6d2ludGVyODYzMTY=");
-            serializer = Xml.newSerializer();
-            InputStream in = connection.getInputStream();
-            Xml.parse(in, Xml.findEncodingByName("iso-8859-1"), new VertretungsplanHandler());
-        }catch(IOException | SAXException e) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "iso-8859-1"));
+            String src = "";
+            String line;
+            while((line = in.readLine()) != null) {
+                src += line + '\n';
+            }
+
+            int index = -1;
+            while((index = src.indexOf("<tr class=\"normal", index+1)) >= 0) {
+                int end = src.indexOf("</tr>", index);
+                int i = src.indexOf("<td class=\"VBlock", index);
+                if(i < 0 || i > end)
+                    continue;
+                i = src.indexOf(">", i);
+                int j = src.indexOf("<", i);
+                String classes = src.substring(i+1, j).trim();
+                if(!(classes.startsWith("Q11") && classes.contains(""))) {
+                    src = src.substring(0, index) + src.substring(end+5);
+                }
+            }
+            publishProgress(src);
+        }catch(Exception e) {
             return e;
         }
         return null;
@@ -43,62 +59,10 @@ public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
         webview.loadData(Uri.encode(progress[0]), "text/html; charset=UTF-8", null);
     }
 
-    private class VertretungsplanHandler implements ContentHandler {
-
-        @Override
-        public void characters(char[] ch, int start, int length) {
-
-        }
-
-
-        @Override
-        public void endDocument() {
-
-        }
-
-        @Override
-        public void endElement(String uri, String localName, String qName) {
-
-        }
-
-        @Override
-        public void endPrefixMapping(String prefix) {
-
-        }
-
-        @Override
-        public void ignorableWhitespace(char[] ch, int start, int length) {
-
-        }
-
-        @Override
-        public void processingInstruction(String target, String data) {
-
-        }
-
-        @Override
-        public void setDocumentLocator(Locator locator) {
-
-        }
-
-        @Override
-        public void skippedEntity(String name) {
-
-        }
-
-        @Override
-        public void startDocument() {
-
-        }
-
-        @Override
-        public void startElement(String uri, String localName, String qName, Attributes atts) {
-
-        }
-
-        @Override
-        public void startPrefixMapping(String prefix, String uri) {
-
-        }
+    @Override
+    protected void onPostExecute(Exception e) {
+        if(e != null)
+            Toast.makeText(c, e.getMessage(), Toast.LENGTH_LONG).show();
     }
+
 }
