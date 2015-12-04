@@ -15,10 +15,14 @@ public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
 
     private WebView webview;
     private Context c;
+    private String klassenstufe;
+    private String klassenbuchstabe;
 
-    public UpdateVertretungsplan(WebView webview, Context c) {
+    public UpdateVertretungsplan(WebView webview, Context c, String klassenstufe, String klassenbuchstabe) {
         this.webview = webview;
         this.c = c;
+        this.klassenstufe = klassenstufe;
+        this.klassenbuchstabe = klassenbuchstabe;
     }
 
     @Override
@@ -43,7 +47,7 @@ public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
                 i = src.indexOf(">", i);
                 int j = src.indexOf("<", i);
                 String classes = src.substring(i+1, j).trim();
-                if(!(classes.startsWith("Q11") && classes.contains(""))) {
+                if(!(classes.startsWith(klassenstufe) && classes.contains(klassenbuchstabe))) {
                     src = src.substring(0, index) + src.substring(end+5);
                 }
             }

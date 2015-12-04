@@ -24,15 +24,14 @@ public class MainActivity extends Activity {
         setContentView(webview);
         // setContentView(R.layout.main);
         // webview = (WebView)findViewById(R.id.webview);
-        update();
-    }
-
-    public void update() {
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE);
         int ks = pref.getInt("klassenstufe", 0);
-        String klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks];
         String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
+        update(ks, klassenbuchstabe);
+    }
 
+    public void update(int ks, String klassenbuchstabe) {
+        String klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks];
         try {
             UpdateVertretungsplan task = new UpdateVertretungsplan(webview, this, klassenstufe, klassenbuchstabe);
             task.execute(new URL(getResources().getString(R.string.vp_url)));
@@ -52,11 +51,19 @@ public class MainActivity extends Activity {
         switch(item.getItemId()) {
             case R.id.settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,0);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        int ks = data.getIntExtra("klassenstufe", 0);
+        String kb = data.getStringExtra("klassenbuchstabe");
+        webview.loadUrl("about:blank");
+        update(ks, kb);
     }
 
 }
