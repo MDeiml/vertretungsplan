@@ -2,4 +2,17 @@
 <resources>
     <string name="app_name">Vertretungsplan</string>
     <string name="vp_url">http://www.gym-friedberg.de/extscripts/schueler/vertretungsplan/</string>
+    <string name="einstellungen">Eingstellungen</string>
+    <string name="klassenstufe">Klassenstufe</string>
+    <string name="klassenbuchstabe">Klassenbuchstabe</string>
+    <string-array name="klassenstufen">
+      <item>5</item>
+      <item>6</item>
+      <item>7</item>
+      <item>8</item>
+      <item>9</item>
+      <item>10</item>
+      <item>Q11</item>
+      <item>Q12</item>
+    </string-array>
 </resources>

@@ -1,4 +1,4 @@
-﻿# Vertretungsplan
+# Vertretungsplan
 Eine Android App für den [Online Vertreungsplan des Gymnasium Friedberg](http://www.gym-friedberg.de/extscripts/schueler/vertretungsplan/)
 
 ## Features
@@ -8,10 +8,12 @@ Eine Android App für den [Online Vertreungsplan des Gymnasium Friedberg](http:/
 
 ## TODO
 
-* Parsen der Website (XmlPullParser):
+* Parsen der Website:
   * Filter-Algorithmus
-  * Speichern der Einstellungen
+  * Speichern der Einstellungen:
+    * Klassenstufe(Auswahl)
+    * Klassenbuchstabe
+    * Kurse(Checkboxes)
+    * Einstellungen zu Notifications
 * Authentifizierung
-* Notifications:
-  * Änderung des Vertretungsplans
-  * Heutiger Vertretungsplan
+* Notifications
