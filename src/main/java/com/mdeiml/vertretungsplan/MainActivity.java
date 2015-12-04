@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
         setContentView(webview);
         // setContentView(R.layout.main);
         // webview = (WebView)findViewById(R.id.webview);
+        update();
     }
 
     public void update() {
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
         int ks = pref.getInt("klassenstufe", 0);
         String klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks];
         String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
-        
+
         try {
             UpdateVertretungsplan task = new UpdateVertretungsplan(webview, this, klassenstufe, klassenbuchstabe);
             task.execute(new URL(getResources().getString(R.string.vp_url)));
