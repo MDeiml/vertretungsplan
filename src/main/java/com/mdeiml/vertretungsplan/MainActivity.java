@@ -9,19 +9,32 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 public class MainActivity extends Activity {
+
+    private WebView webview;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        WebView webview = new WebView(this);
+
+        webview = new WebView(this);
         webview.setInitialScale(50);
         setContentView(webview);
         // setContentView(R.layout.main);
-        // WebView webview = (WebView)findViewById(R.id.webview);
+        // webview = (WebView)findViewById(R.id.webview);
+    }
+
+    public void update() {
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE);
+        int ks = pref.getInt("klassenstufe", 0);
+        String klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks];
+        String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
+        
         try {
-            new UpdateVertretungsplan(webview, this).execute(new URL(getResources().getString(R.string.vp_url)));
+            UpdateVertretungsplan task = new UpdateVertretungsplan(webview, this, klassenstufe, klassenbuchstabe);
+            task.execute(new URL(getResources().getString(R.string.vp_url)));
         }catch(MalformedURLException e) {}
     }
 
