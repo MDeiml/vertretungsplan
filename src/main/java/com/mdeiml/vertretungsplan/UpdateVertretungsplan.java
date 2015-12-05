@@ -13,7 +13,7 @@ import java.io.InputStreamReader;
 
 public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
 
-    private WebView webview;
+    private WebView webview; // WebView, das den Vertretungsplan entahlten soll
     private Context c;
     private String klassenstufe;
     private String klassenbuchstabe;
@@ -29,29 +29,29 @@ public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
     protected Exception doInBackground(URL... url) {
         //TODO: Das hier schreiben
         try {
-            HttpURLConnection connection = (HttpURLConnection)url[0].openConnection();
+            HttpURLConnection connection = (HttpURLConnection)url[0].openConnection(); // Verbindung mit Server aufbauen
             connection.setRequestProperty("Authorization", "Basic c2NodWVsZXI6d2ludGVyODYzMTY=");
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "iso-8859-1"));
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "iso-8859-1")); // InputStream mit Umlauten lesen
             String src = "";
             String line;
-            while((line = in.readLine()) != null) {
+            while((line = in.readLine()) != null) { // alles laden
                 src += line + '\n';
             }
 
             int index = -1;
-            while((index = src.indexOf("<tr class=\"normal", index+1)) >= 0) {
-                int end = src.indexOf("</tr>", index);
-                int i = src.indexOf("<td class=\"VBlock", index);
-                if(i < 0 || i > end)
+            while((index = src.indexOf("<tr class=\"normal", index+1)) >= 0) { // nächster Eintrag
+                int end = src.indexOf("</tr>", index); // Ende des Eintrags
+                int i = src.indexOf("<td class=\"VBlock", index); // 1. Spalte des Eintrags (Klasse)
+                if(i < 0 || i > end) // wenn keine Klasse in dem Eintrag ist überspringen
                     continue;
                 i = src.indexOf(">", i);
                 int j = src.indexOf("<", i);
-                String classes = src.substring(i+1, j).trim();
+                String classes = src.substring(i+1, j).trim(); // Inhalt der 1. Spalte
                 if(!(classes.startsWith(klassenstufe) && classes.contains(klassenbuchstabe))) {
-                    src = src.substring(0, index) + src.substring(end+5);
+                    src = src.substring(0, index) + src.substring(end+5); // wenn nicht die eingestellte Klasse Zeile entfernen
                 }
             }
-            publishProgress(src);
+            publishProgress(src); // Vertretungsplan anzeigen
         }catch(Exception e) {
             return e;
         }
@@ -60,12 +60,12 @@ public class UpdateVertretungsplan extends AsyncTask<URL, String, Exception> {
 
     @Override
     protected void onProgressUpdate(String... progress) {
-        webview.loadData(Uri.encode(progress[0]), "text/html; charset=UTF-8", null);
+        webview.loadData(Uri.encode(progress[0]), "text/html; charset=UTF-8", null); // progress als html anzeigen
     }
 
     @Override
     protected void onPostExecute(Exception e) {
-        if(e != null)
+        if(e != null) // wenn Fehler vorhanden diesen anzeigen
             Toast.makeText(c, e.getMessage(), Toast.LENGTH_LONG).show();
     }
 
