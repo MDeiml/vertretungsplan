@@ -29,7 +29,7 @@ public class SettingsActivity extends Activity {
         klassenbuchstabe.setText(klassenbuchstabeS);
 
         klassenstufe = (Spinner)findViewById(R.id.klassenstufe);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.klassenstufen, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.klassenstufen, R.layout.spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         klassenstufe.setAdapter(adapter);
         klassenstufe.setSelection(klassenstufeI);

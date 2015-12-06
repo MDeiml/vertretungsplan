@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
 
         webview = new WebView(this); // manuelle Erzeugung des Layouts
         webview.setInitialScale(50); // Breite des Vertretungsplan entspricht Bilschirmbreite
+        webview.getSettings().setBuiltInZoomControls(true);
         setContentView(webview);
         // setContentView(R.layout.main);
         // webview = (WebView)findViewById(R.id.webview);
