@@ -10,6 +10,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.content.SharedPreferences;
 import android.content.Intent;
+import android.widget.Button;
+import android.view.View.OnClickListener;
+import android.widget.TextView.SavedState;
 
 public class SettingsActivity extends Activity {
 
@@ -27,6 +30,9 @@ public class SettingsActivity extends Activity {
 
         klassenbuchstabe = (EditText)findViewById(R.id.klassenbuchstabe);
         klassenbuchstabe.setText(klassenbuchstabeS);
+        if(klassenstufeI > 5) {
+            klassenbuchstabe.setEnabled(false);
+        }
 
         klassenstufe = (Spinner)findViewById(R.id.klassenstufe);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.klassenstufen, R.layout.spinner_item);
@@ -47,12 +53,18 @@ public class SettingsActivity extends Activity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+        
+        Button ok = (Button)findViewById(R.id.einstellungen_ok);
+        ok.setOnClickListener(new OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                save();
+                finish();
+            }
+        });
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onStop();
-
+    
+    public void save() {
         int ks = klassenstufe.getSelectedItemPosition();
         String kb = klassenbuchstabe.getText().toString();
         // Einstellungen speichern
@@ -65,6 +77,11 @@ public class SettingsActivity extends Activity {
         intent.putExtra("klassenstufe", ks);
         intent.putExtra("klassenbuchstabe", kb);
         setResult(RESULT_OK,intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        save();
         super.onBackPressed();
     }
 

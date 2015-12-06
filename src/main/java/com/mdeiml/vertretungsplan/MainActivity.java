@@ -26,9 +26,12 @@ public class MainActivity extends Activity {
         // setContentView(R.layout.main);
         // webview = (WebView)findViewById(R.id.webview);
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
-        int ks = pref.getInt("klassenstufe", 0); // Default: 5A
+        int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
         String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
-        update(ks, klassenbuchstabe); // den Vertretungsplan abrufen
+        if(ks != -1)
+            update(ks, klassenbuchstabe); // den Vertretungsplan abrufen
+        else
+            startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
     public void update(int ks, String klassenbuchstabe) {
