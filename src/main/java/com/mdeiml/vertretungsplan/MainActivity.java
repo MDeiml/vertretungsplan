@@ -10,6 +10,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import android.util.Log;
 
 public class MainActivity extends Activity {
 
@@ -35,11 +39,8 @@ public class MainActivity extends Activity {
     }
 
     public void update(int ks, String klassenbuchstabe) {
-        String klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks]; // Klassenstufe in String umwandeln(0 = "5")
-        try {
-            UpdateVertretungsplan task = new UpdateVertretungsplan(webview, this, klassenstufe, klassenbuchstabe);
-            task.execute(new URL(getResources().getString(R.string.vp_url))); // Vertretungsplan im Hintergrund laden
-        }catch(MalformedURLException e) {}
+        new UpdateVertretungsplan(this).execute();
+        new LoadVertretungsplan().execute();
     }
 
     @Override
@@ -69,6 +70,25 @@ public class MainActivity extends Activity {
         String kb = data.getStringExtra("klassenbuchstabe");
         webview.loadUrl("about:blank"); // leere Seite
         update(ks, kb); // Vertretungsplan aktualisieren
+    }
+
+    private class LoadVertretungsplan extends AsyncTask<Void, Void, Void> {
+
+        private final String[] projection = new String[] {"tag", "stunde", "fach"};
+
+        protected Void doInBackground(Void... v) {
+            VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
+            SQLiteDatabase db = openHelper.getReadableDatabase();
+
+            String selection = "klasse='Q11'";
+
+            Cursor c = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, new String[0], null, null, null);
+            c.moveToFirst();
+            Log.i("MainActivity", c.getString(c.getColumnIndexOrThrow("fach")));
+
+            return null;
+        }
+
     }
 
 }
