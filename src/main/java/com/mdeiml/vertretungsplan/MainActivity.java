@@ -40,7 +40,7 @@ public class MainActivity extends Activity {
 
     public void update(int ks, String klassenbuchstabe) {
         new UpdateVertretungsplan(this).execute();
-        new LoadVertretungsplan().execute();
+        new LoadVertretungsplan(ks, klassenbuchstabe).execute();
     }
 
     @Override
@@ -75,12 +75,19 @@ public class MainActivity extends Activity {
     private class LoadVertretungsplan extends AsyncTask<Void, Void, Void> {
 
         private final String[] projection = new String[] {"tag", "stunde", "fach"};
+        private String klassenstufe;
+        private String klassenbuchstabe;
+        
+        public LoadVertretungsplan(int ks, String kb) {
+            this.klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks];
+            this.klassenbuchstabe = kb;
+        }
 
         protected Void doInBackground(Void... v) {
             VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
             SQLiteDatabase db = openHelper.getReadableDatabase();
 
-            String selection = "klasse='Q11'";
+            String selection = "klasse LIKE '"+klassenstufe+"%'AND klasse LIKE '%"+klassenbuchstabe+"%'";
 
             Cursor c = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, new String[0], null, null, null);
             c.moveToFirst();
