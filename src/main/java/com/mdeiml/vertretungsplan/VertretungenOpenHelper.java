@@ -8,7 +8,7 @@ public class VertretungenOpenHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_NAME = "vertretungen";
     private static final String CREATE_DATABASE = "CREATE TABLE "+TABLE_NAME+" (" +
-                                               "id INTEGER PRIMARY KEY," +
+                                               "_id INTEGER PRIMARY KEY," +
                                                "tag TEXT," +
                                                "klasse TEXT," +
                                                "stunde INTEGER," +
@@ -20,11 +20,15 @@ public class VertretungenOpenHelper extends SQLiteOpenHelper {
                                                "bemerkung TEXT)";
     private static final String DELETE_DATABASE = "DROP TABLE IF EXISTS "+TABLE_NAME;
 
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "Vertretungen.db";
 
     public VertretungenOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public void clear(SQLiteDatabase db) {
+        db.execSQL("DELETE * FROM "+TABLE_NAME);
     }
 
     public void reset(SQLiteDatabase db) {

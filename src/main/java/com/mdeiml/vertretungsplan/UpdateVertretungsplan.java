@@ -16,9 +16,11 @@ import android.util.Log;
 public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
 
     private Context c;
+    private AsyncTask<Void, ?, ?> after;
 
-    public UpdateVertretungsplan(Context c) {
+    public UpdateVertretungsplan(Context c, AsyncTask<Void, ?, ?> after) {
         this.c = c;
+        this.after = after;
     }
 
     @Override
@@ -28,11 +30,14 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
         SQLiteDatabase db = openHelper.getWritableDatabase();
         openHelper.reset(db);
         try {
+            int temp = 0; //TODO
             Document doc = Jsoup.connect(url).header("Authorization", "Basic c2NodWVsZXI6d2ludGVyODYzMTY=").get();
 
             Elements tageE = doc.select("div");
             for(Element tagE : tageE) {
                 String datum = tagE.select("td.Datum").get(0).ownText().split(" ")[1];
+                String[] datum1 = datum.split("\\.");
+                datum = datum1[2]+"-"+datum1[1]+"-"+datum1[0];
 
                 Elements vb = tagE.select("table.VBlock");
                 if(vb.isEmpty())
@@ -58,8 +63,10 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
                     values.put("bemerkung", children.get(6).ownText());
 
                     db.insert(VertretungenOpenHelper.TABLE_NAME, "null", values);
+                    temp++;
                 }
             }
+            Log.i("UpdateVertretungsplan", temp+" Vertretungen gespeichert");
         }catch(Exception e) {
             return e;
         }
@@ -68,7 +75,10 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
 
     @Override
     protected void onPostExecute(Exception e) {
-        Log.e("UpdateVertretungsplan", "", e);
+        if(e != null)
+            Log.e("UpdateVertretungsplan", "", e);
+        if(after != null)
+            after.execute();
     }
 
 }

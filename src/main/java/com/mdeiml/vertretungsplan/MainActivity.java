@@ -13,22 +13,24 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
+import android.widget.CursorAdapter;
+import android.widget.TextView;
+import android.widget.ListView;
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
 import android.util.Log;
 
 public class MainActivity extends Activity {
 
-    private WebView webview; // WebView, das den Vertretungsplan anzeigt
+    private CursorAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
 
-        webview = new WebView(this); // manuelle Erzeugung des Layouts
-        webview.setInitialScale(50); // Breite des Vertretungsplan entspricht Bilschirmbreite
-        webview.getSettings().setBuiltInZoomControls(true);
-        setContentView(webview);
-        // setContentView(R.layout.main);
-        // webview = (WebView)findViewById(R.id.webview);
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
         int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
         String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
@@ -39,8 +41,7 @@ public class MainActivity extends Activity {
     }
 
     public void update(int ks, String klassenbuchstabe) {
-        new UpdateVertretungsplan(this).execute();
-        new LoadVertretungsplan(ks, klassenbuchstabe).execute();
+        new UpdateVertretungsplan(this, new LoadVertretungen()).execute();
     }
 
     @Override
@@ -68,34 +69,107 @@ public class MainActivity extends Activity {
         // Bei neuen Einstellungen
         int ks = data.getIntExtra("klassenstufe", 0);
         String kb = data.getStringExtra("klassenbuchstabe");
-        webview.loadUrl("about:blank"); // leere Seite
         update(ks, kb); // Vertretungsplan aktualisieren
     }
 
-    private class LoadVertretungsplan extends AsyncTask<Void, Void, Void> {
+    private class LoadVertretungen extends AsyncTask<Void, Void, Cursor> {
 
-        private final String[] projection = new String[] {"tag", "stunde", "fach"};
-        private String klassenstufe;
-        private String klassenbuchstabe;
-        
-        public LoadVertretungsplan(int ks, String kb) {
-            this.klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks];
-            this.klassenbuchstabe = kb;
-        }
-
-        protected Void doInBackground(Void... v) {
-            VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
-            SQLiteDatabase db = openHelper.getReadableDatabase();
-
-            String selection = "klasse LIKE '"+klassenstufe+"%'AND klasse LIKE '%"+klassenbuchstabe+"%'";
-
-            Cursor c = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, new String[0], null, null, null);
-            c.moveToFirst();
-            Log.i("MainActivity", c.getString(c.getColumnIndexOrThrow("fach")));
-
+        public Cursor doInBackground(Void... v) {
+            try {
+                VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
+                SQLiteDatabase db = openHelper.getReadableDatabase();
+                String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "fach", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
+                String selection = "klasse LIKE 'Q11%' AND klasse LIKE '%%'";
+                String orderBy = "date(tag), stunde";
+                Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, orderBy, null);
+                Log.i("MainActivity", cursor.getCount()+" Vertretungen geladen");
+                return cursor;
+            }catch(Exception e) {
+                Log.e("MainActivity", "", e);
+            }
             return null;
         }
 
+        public void onPostExecute(Cursor cursor) {
+            ListView list = (ListView)findViewById(R.id.vertretungen_list);
+            VertretungenAdapter adapter = new VertretungenAdapter(cursor);
+            list.setAdapter(adapter);
+        }
+
+    }
+
+    private class VertretungenAdapter extends CursorAdapter {
+
+        public VertretungenAdapter(Cursor cursor) {
+            super(MainActivity.this, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.vertretung_list_item, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView stundeV = (TextView)view.findViewById(R.id.vertretung_stunde);
+            TextView lehererFachV = (TextView)view.findViewById(R.id.vertretung_lehrerfach);
+            TextView vfachV = (TextView)view.findViewById(R.id.vertretung_vfach);
+            TextView vlehrerV = (TextView)view.findViewById(R.id.vertretung_vlehrer);
+            TextView raumV = (TextView)view.findViewById(R.id.vertretung_raum);
+            TextView bemerkungV = (TextView)view.findViewById(R.id.vertretung_bemerkung);
+
+            int stunde = cursor.getInt(cursor.getColumnIndexOrThrow("stunde"));
+            String lehrer = cursor.getString(cursor.getColumnIndexOrThrow("lehrer"));
+            String fach = cursor.getString(cursor.getColumnIndexOrThrow("fach"));
+            String vfach = cursor.getString(cursor.getColumnIndexOrThrow("vfach"));
+            String vlehrer = cursor.getString(cursor.getColumnIndexOrThrow("vlehrer"));
+            String raum = cursor.getString(cursor.getColumnIndexOrThrow("raum"));
+            String bemerkung = cursor.getString(cursor.getColumnIndexOrThrow("bemerkung"));
+
+            if(vlehrer.trim().equals("entfällt")) {
+                View pane = view.findViewById(R.id.vertretung_pane);
+                pane.setBackgroundResource(R.color.Entfaellt);
+            }else if(bemerkung.equals("Raumänderung")) {
+                View pane = view.findViewById(R.id.vertretung_pane);
+                pane.setBackgroundResource(R.color.Raumaenderung);
+            }else {
+                View pane = view.findViewById(R.id.vertretung_pane);
+                pane.setBackgroundResource(R.color.Vertreten);
+            }
+
+            Log.i("MainActivity", stunde+", "+fach);
+
+            stundeV.setText(stunde+".");
+            lehererFachV.setText(lehrer+" / "+fach);
+
+            if(vfach.isEmpty()) {
+                vfachV.setVisibility(View.GONE);
+            }else {
+                vfachV.setText(vfach);
+                vfachV.setVisibility(View.VISIBLE);
+            }
+
+            if(vlehrer.isEmpty()) {
+                vlehrerV.setVisibility(View.GONE);
+            }else {
+                vlehrerV.setText(vlehrer);
+                vlehrerV.setVisibility(View.VISIBLE);
+            }
+
+            if(raum.isEmpty()) {
+                raumV.setVisibility(View.GONE);
+            }else {
+                raumV.setText(raum);
+                raumV.setVisibility(View.VISIBLE);
+            }
+
+            if(bemerkung.isEmpty()) {
+                bemerkungV.setVisibility(View.GONE);
+            }else {
+                bemerkungV.setText(bemerkung);
+                bemerkungV.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
 }
