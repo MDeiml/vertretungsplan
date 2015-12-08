@@ -21,26 +21,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
-    private CursorAdapter adapter;
+    private ListView list;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+
+        list = (ListView)findViewById(R.id.vertretungen_list);
 
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
         int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
-        String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
         if(ks != -1)
-            update(ks, klassenbuchstabe); // den Vertretungsplan abrufen
+            update(); // den Vertretungsplan abrufen
         else
             startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
-    public void update(int ks, String klassenbuchstabe) {
+    public void update() {
         new UpdateVertretungsplan(this, new LoadVertretungen()).execute();
     }
 
@@ -67,19 +72,23 @@ public class MainActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Bei neuen Einstellungen
-        int ks = data.getIntExtra("klassenstufe", 0);
-        String kb = data.getStringExtra("klassenbuchstabe");
-        update(ks, kb); // Vertretungsplan aktualisieren
+        list.setAdapter(null);
+        new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
     }
 
     private class LoadVertretungen extends AsyncTask<Void, Void, Cursor> {
 
         public Cursor doInBackground(Void... v) {
             try {
+                SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
+                int ksI = pref.getInt("klassenstufe", 0); //Default: 5. Klasse
+                String ks = getResources().getStringArray(R.array.klassenstufen)[ksI];
+                String kb = pref.getString("klassenbuchstabe", "A");
+
                 VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
                 SQLiteDatabase db = openHelper.getReadableDatabase();
                 String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "fach", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
-                String selection = "klasse LIKE 'Q11%' AND klasse LIKE '%%'";
+                String selection = "klasse == 'all' OR (klasse LIKE '"+ks+"%' AND klasse LIKE '%"+kb+"%')";
                 String orderBy = "date(tag), stunde";
                 Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, orderBy, null);
                 Log.i("MainActivity", cursor.getCount()+" Vertretungen geladen");
@@ -91,7 +100,8 @@ public class MainActivity extends Activity {
         }
 
         public void onPostExecute(Cursor cursor) {
-            ListView list = (ListView)findViewById(R.id.vertretungen_list);
+            if(cursor == null)
+                return;
             VertretungenAdapter adapter = new VertretungenAdapter(cursor);
             list.setAdapter(adapter);
         }
@@ -124,23 +134,35 @@ public class MainActivity extends Activity {
             String vfach = cursor.getString(cursor.getColumnIndexOrThrow("vfach"));
             String vlehrer = cursor.getString(cursor.getColumnIndexOrThrow("vlehrer"));
             String raum = cursor.getString(cursor.getColumnIndexOrThrow("raum"));
-            String bemerkung = cursor.getString(cursor.getColumnIndexOrThrow("bemerkung"));
+            String bemerkung = cursor.getString(cursor.getColumnIndexOrThrow("bemerkung")).replaceAll("§", "\n");
 
-            if(vlehrer.trim().equals("entfällt")) {
-                View pane = view.findViewById(R.id.vertretung_pane);
+            View pane = view.findViewById(R.id.vertretung_pane);
+
+            if(stunde == 0) {
+                //TODO
+            }
+
+            if(stunde == 0) {
+                pane.setBackgroundResource(R.color.Tag);
+            }else if(vlehrer.trim().equals("entfällt")) {
                 pane.setBackgroundResource(R.color.Entfaellt);
             }else if(bemerkung.equals("Raumänderung")) {
-                View pane = view.findViewById(R.id.vertretung_pane);
                 pane.setBackgroundResource(R.color.Raumaenderung);
             }else {
-                View pane = view.findViewById(R.id.vertretung_pane);
                 pane.setBackgroundResource(R.color.Vertreten);
             }
 
             Log.i("MainActivity", stunde+", "+fach);
 
-            stundeV.setText(stunde+".");
-            lehererFachV.setText(lehrer+" / "+fach);
+            if(stunde != 0) {
+                stundeV.setText(stunde+". Stunde");
+                stundeV.setVisibility(View.VISIBLE);
+                lehererFachV.setText(lehrer+" / "+fach);
+                lehererFachV.setVisibility(View.VISIBLE);
+            }else {
+                stundeV.setVisibility(View.GONE);
+                lehererFachV.setVisibility(View.GONE);
+            }
 
             if(vfach.isEmpty()) {
                 vfachV.setVisibility(View.GONE);

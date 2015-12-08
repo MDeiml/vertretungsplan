@@ -9,9 +9,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.jsoup.Jsoup;
+import org.jsoup.Connection;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
 import android.util.Log;
+import java.text.SimpleDateFormat;
 
 public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
 
@@ -30,14 +32,34 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
         SQLiteDatabase db = openHelper.getWritableDatabase();
         openHelper.reset(db);
         try {
-            int temp = 0; //TODO
-            Document doc = Jsoup.connect(url).header("Authorization", "Basic c2NodWVsZXI6d2ludGVyODYzMTY=").get();
+            Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic c2NodWVsZXI6d2ludGVyODYzMTY=").execute();
+            //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
+            Document doc = response.parse();
 
             Elements tageE = doc.select("div");
             for(Element tagE : tageE) {
-                String datum = tagE.select("td.Datum").get(0).ownText().split(" ")[1];
-                String[] datum1 = datum.split("\\.");
-                datum = datum1[2]+"-"+datum1[1]+"-"+datum1[0];
+                String datumRaw = tagE.select("td.Datum").get(0).ownText();
+                String[] datum1 = datumRaw.split(" ")[1].split("\\.");
+                String datum = datum1[2]+"-"+datum1[1]+"-"+datum1[0];
+
+                Elements bitteBeachtenBlock = tagE.select("table.BitteBeachtenBlock");
+                String bitteBeachten = "";
+                if(!bitteBeachtenBlock.isEmpty()) {
+                    Element bitteBeachtenE = bitteBeachtenBlock.get(0).select("tr").get(0).children().get(1);
+                    bitteBeachtenE.select("br").append("\\n");
+                    bitteBeachten = bitteBeachtenE.text().replaceAll("\\\\n", "§");
+                }
+
+                ContentValues tagValues = new ContentValues();
+                tagValues.put("tag", datum);
+                tagValues.put("klasse", "all");
+                tagValues.put("stunde", 0);
+                tagValues.put("vlehrer", datumRaw);
+                tagValues.put("vfach", "");
+                tagValues.put("raum", "");
+                tagValues.put("bemerkung", bitteBeachten);
+
+                db.insert(VertretungenOpenHelper.TABLE_NAME, "null", tagValues);
 
                 Elements vb = tagE.select("table.VBlock");
                 if(vb.isEmpty())
@@ -63,10 +85,8 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
                     values.put("bemerkung", children.get(6).ownText());
 
                     db.insert(VertretungenOpenHelper.TABLE_NAME, "null", values);
-                    temp++;
                 }
             }
-            Log.i("UpdateVertretungsplan", temp+" Vertretungen gespeichert");
         }catch(Exception e) {
             return e;
         }

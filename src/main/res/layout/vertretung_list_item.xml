@@ -9,7 +9,8 @@
         android:elevation="5dp"
         android:background="@color/Vertreten"
         android:padding="5dp"
-        android:layout_margin="5dp">
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
         <TableLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -24,7 +25,7 @@
                     android:gravity="left">
                     <TextView
                         android:layout_marginLeft="10dp"
-                        android:textColor="@color/ColorText"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/vertretung_stunde"/>
@@ -36,7 +37,7 @@
                     android:gravity="right">
                     <TextView
                         android:layout_marginRight="10dp"
-                        android:textColor="@color/ColorText"
+                        android:textColor="#FFFFFF"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/vertretung_lehrerfach"/>
@@ -51,27 +52,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:textColor="@color/ColorText"
+                    android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/vertretung_vfach"
-                    android:padding="10dp"/>
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
                 <TextView
-                    android:textColor="@color/ColorText"
+                    android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/vertretung_vlehrer"
-                    android:padding="10dp"/>
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
                 <TextView
-                    android:textColor="@color/ColorText"
+                    android:textColor="#FFFFFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/vertretung_raum"
-                    android:padding="10dp"/>
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"/>
             </TableRow>
         </TableLayout>
         <TextView
-            android:textColor="@color/ColorText"
+            android:textColor="#FFFFFF"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/vertretung_bemerkung"

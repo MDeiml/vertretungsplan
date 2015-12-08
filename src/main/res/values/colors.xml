@@ -5,7 +5,12 @@
     <color name="ColorAccent">#112244</color>
     <color name="ColorText">#FFFFFF</color>
     <color name="ColorPrimaryLight">#DDDFFF</color>
-    <color name="Vertreten">#3A6EA5</color>
-    <color name="Entfaellt">#A43A3A</color>
-    <color name="Raumaenderung">#3AA44B</color>
+    <!-- <color name="Vertreten">#BBDEFB</color>
+    <color name="Entfaellt">#FFCCBC</color>
+    <color name="Raumaenderung">#C8E6C9</color>
+    <color name="Tag">#BBBBBB</color> -->
+    <color name="Vertreten">#2196f3</color>
+    <color name="Entfaellt">#f44336</color>
+    <color name="Raumaenderung">#4caf50</color>
+    <color name="Tag">#BBBBBB</color>
 </resources>
