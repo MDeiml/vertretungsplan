@@ -10,36 +10,45 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import android.widget.CursorAdapter;
+import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.LinearLayout;
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
+import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import java.util.ArrayList;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
-    private WebView webview; // WebView, das den Vertretungsplan anzeigt
+    private ListView list;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
 
-        webview = new WebView(this); // manuelle Erzeugung des Layouts
-        webview.setInitialScale(50); // Breite des Vertretungsplan entspricht Bilschirmbreite
-        webview.getSettings().setBuiltInZoomControls(true);
-        setContentView(webview);
-        // setContentView(R.layout.main);
-        // webview = (WebView)findViewById(R.id.webview);
+        list = (ListView)findViewById(R.id.vertretungen_list);
+
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
         int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
-        String klassenbuchstabe = pref.getString("klassenbuchstabe", "A");
         if(ks != -1)
-            update(ks, klassenbuchstabe); // den Vertretungsplan abrufen
+            update(); // den Vertretungsplan abrufen
         else
             startActivityForResult(new Intent(this, SettingsActivity.class), 0);
     }
 
-    public void update(int ks, String klassenbuchstabe) {
-        String klassenstufe = getResources().getStringArray(R.array.klassenstufen)[ks]; // Klassenstufe in String umwandeln(0 = "5")
-        try {
-            UpdateVertretungsplan task = new UpdateVertretungsplan(webview, this, klassenstufe, klassenbuchstabe);
-            task.execute(new URL(getResources().getString(R.string.vp_url))); // Vertretungsplan im Hintergrund laden
-        }catch(MalformedURLException e) {}
+    public void update() {
+        new UpdateVertretungsplan(this, new LoadVertretungen()).execute();
     }
 
     @Override
@@ -65,10 +74,130 @@ public class MainActivity extends Activity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Bei neuen Einstellungen
-        int ks = data.getIntExtra("klassenstufe", 0);
-        String kb = data.getStringExtra("klassenbuchstabe");
-        webview.loadUrl("about:blank"); // leere Seite
-        update(ks, kb); // Vertretungsplan aktualisieren
+        list.setAdapter(null);
+        new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
+    }
+
+    private class LoadVertretungen extends AsyncTask<Void, Void, Cursor> {
+
+        public Cursor doInBackground(Void... v) {
+            try {
+                SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
+                int ksI = pref.getInt("klassenstufe", 0); //Default: 5. Klasse
+                String ks = getResources().getStringArray(R.array.klassenstufen)[ksI];
+                String kb = pref.getString("klassenbuchstabe", "A");
+
+                VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
+                SQLiteDatabase db = openHelper.getReadableDatabase();
+                String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "fach", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
+                String selection = "klasse == 'all' OR (klasse LIKE '"+ks+"%' AND klasse LIKE '%"+kb+"%')";
+                String orderBy = "date(tag), stunde";
+                Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, orderBy, null);
+                Log.i("MainActivity", cursor.getCount()+" Vertretungen geladen");
+                return cursor;
+            }catch(Exception e) {
+                Log.e("MainActivity", "", e);
+            }
+            return null;
+        }
+
+        public void onPostExecute(Cursor cursor) {
+            if(cursor == null)
+                return;
+            VertretungenAdapter adapter = new VertretungenAdapter(cursor);
+            list.setAdapter(adapter);
+        }
+
+    }
+
+    private class VertretungenAdapter extends CursorAdapter {
+
+        public VertretungenAdapter(Cursor cursor) {
+            super(MainActivity.this, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.vertretung_list_item, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView stundeV = (TextView)view.findViewById(R.id.vertretung_stunde);
+            TextView klasseV = (TextView)view.findViewById(R.id.vertretung_klasse);
+            TextView vertretungV = (TextView)view.findViewById(R.id.vertretung);
+            TextView bemerkungV = (TextView)view.findViewById(R.id.vertretung_bemerkung);
+
+            int stunde = cursor.getInt(cursor.getColumnIndexOrThrow("stunde"));
+            String lehrer = cursor.getString(cursor.getColumnIndexOrThrow("lehrer"));
+            String fach = cursor.getString(cursor.getColumnIndexOrThrow("fach"));
+            String vfach = cursor.getString(cursor.getColumnIndexOrThrow("vfach"));
+            String vlehrer = cursor.getString(cursor.getColumnIndexOrThrow("vlehrer"));
+            String raum = cursor.getString(cursor.getColumnIndexOrThrow("raum"));
+            String bemerkung = cursor.getString(cursor.getColumnIndexOrThrow("bemerkung")).replaceAll("§", "\n");
+
+            LinearLayout pane = (LinearLayout)view.findViewById(R.id.vertretung_pane);
+
+            if(stunde == 0) {
+                stundeV.setText(fach);
+                klasseV.setText("");
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)pane.getLayoutParams();
+                lp.leftMargin = 0;
+                pane.setLayoutParams(lp);
+            }else {
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)pane.getLayoutParams();
+                lp.leftMargin = (int)(20 * getResources().getDisplayMetrics().density);
+                pane.setLayoutParams(lp);
+                stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
+                klasseV.setText("Q11"); //TODO
+            }
+
+            if(stunde == 0) {
+                pane.setBackgroundResource(R.color.Tag);
+            }else if(vlehrer.trim().equals("entfällt")) {
+                pane.setBackgroundResource(R.color.Entfaellt);
+            }else if(bemerkung.equals("Raumänderung")) {
+                pane.setBackgroundResource(R.color.Raumaenderung);
+            }else {
+                pane.setBackgroundResource(R.color.Vertreten);
+            }
+
+            Log.i("MainActivity", stunde+", "+fach);
+
+            ArrayList<String> vertretungListe = new ArrayList<>();
+
+            if(!vlehrer.isEmpty()) {
+                vertretungListe.add(vlehrer);
+            }
+
+            if(!vfach.isEmpty()) {
+                vertretungListe.add(vfach);
+            }
+
+            if(!raum.isEmpty()) {
+                vertretungListe.add(raum);
+            }
+
+            if(vertretungListe.isEmpty()) {
+                vertretungV.setVisibility(View.GONE);
+            }else {
+                vertretungV.setVisibility(View.VISIBLE);
+                String s = "";
+                for(int i = 0; i < vertretungListe.size(); i++) {
+                    s = s + vertretungListe.get(i);
+                    if(i < vertretungListe.size()-1)
+                        s = s + " / ";
+                }
+                vertretungV.setText(s);
+            }
+
+            if(bemerkung.isEmpty()) {
+                bemerkungV.setVisibility(View.GONE);
+            }else {
+                bemerkungV.setText(bemerkung);
+                bemerkungV.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
 }

@@ -13,8 +13,10 @@ import android.content.Intent;
 import android.widget.Button;
 import android.view.View.OnClickListener;
 import android.widget.TextView.SavedState;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences pref; // Einstellungen
     private Spinner klassenstufe; // Klassenstufe (0 -> "5")
@@ -24,6 +26,8 @@ public class SettingsActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.settings_toolbar);
+        setSupportActionBar(toolbar);
         pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE); // alte Einstellungen laden
         int klassenstufeI = pref.getInt("klassenstufe", 0); // Default: 5A
         String klassenbuchstabeS = pref.getString("klassenbuchstabe", "A");
@@ -53,7 +57,7 @@ public class SettingsActivity extends Activity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-        
+
         Button ok = (Button)findViewById(R.id.einstellungen_ok);
         ok.setOnClickListener(new OnClickListener(){
             @Override
@@ -63,19 +67,17 @@ public class SettingsActivity extends Activity {
             }
         });
     }
-    
+
     public void save() {
         int ks = klassenstufe.getSelectedItemPosition();
         String kb = klassenbuchstabe.getText().toString();
         // Einstellungen speichern
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("klassenstufe", ks);
-        editor.putString("klassenbuchstabe", kb);
+        editor.putString("klassenbuchstabe", kb.toUpperCase());
         editor.commit();
         // neue Einstellungen an MainActivity übergeben
         Intent intent = new Intent();
-        intent.putExtra("klassenstufe", ks);
-        intent.putExtra("klassenbuchstabe", kb);
         setResult(RESULT_OK,intent);
     }
 
