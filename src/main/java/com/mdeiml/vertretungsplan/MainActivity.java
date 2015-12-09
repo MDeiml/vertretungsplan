@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import android.view.LayoutInflater;
 import android.util.Log;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -122,10 +124,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
             TextView stundeV = (TextView)view.findViewById(R.id.vertretung_stunde);
-            TextView lehererFachV = (TextView)view.findViewById(R.id.vertretung_lehrerfach);
-            TextView vfachV = (TextView)view.findViewById(R.id.vertretung_vfach);
-            TextView vlehrerV = (TextView)view.findViewById(R.id.vertretung_vlehrer);
-            TextView raumV = (TextView)view.findViewById(R.id.vertretung_raum);
+            TextView klasseV = (TextView)view.findViewById(R.id.vertretung_klasse);
+            TextView vertretungV = (TextView)view.findViewById(R.id.vertretung);
             TextView bemerkungV = (TextView)view.findViewById(R.id.vertretung_bemerkung);
 
             int stunde = cursor.getInt(cursor.getColumnIndexOrThrow("stunde"));
@@ -136,10 +136,20 @@ public class MainActivity extends AppCompatActivity {
             String raum = cursor.getString(cursor.getColumnIndexOrThrow("raum"));
             String bemerkung = cursor.getString(cursor.getColumnIndexOrThrow("bemerkung")).replaceAll("§", "\n");
 
-            View pane = view.findViewById(R.id.vertretung_pane);
+            LinearLayout pane = (LinearLayout)view.findViewById(R.id.vertretung_pane);
 
             if(stunde == 0) {
-                //TODO
+                stundeV.setText(fach);
+                klasseV.setText("");
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)pane.getLayoutParams();
+                lp.leftMargin = 0;
+                pane.setLayoutParams(lp);
+            }else {
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)pane.getLayoutParams();
+                lp.leftMargin = (int)(20 * getResources().getDisplayMetrics().density);
+                pane.setLayoutParams(lp);
+                stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
+                klasseV.setText("Q11"); //TODO
             }
 
             if(stunde == 0) {
@@ -154,35 +164,31 @@ public class MainActivity extends AppCompatActivity {
 
             Log.i("MainActivity", stunde+", "+fach);
 
-            if(stunde != 0) {
-                stundeV.setText(stunde+". Stunde");
-                stundeV.setVisibility(View.VISIBLE);
-                lehererFachV.setText(lehrer+" / "+fach);
-                lehererFachV.setVisibility(View.VISIBLE);
-            }else {
-                stundeV.setVisibility(View.GONE);
-                lehererFachV.setVisibility(View.GONE);
+            ArrayList<String> vertretungListe = new ArrayList<>();
+
+            if(!vlehrer.isEmpty()) {
+                vertretungListe.add(vlehrer);
             }
 
-            if(vfach.isEmpty()) {
-                vfachV.setVisibility(View.GONE);
-            }else {
-                vfachV.setText(vfach);
-                vfachV.setVisibility(View.VISIBLE);
+            if(!vfach.isEmpty()) {
+                vertretungListe.add(vfach);
             }
 
-            if(vlehrer.isEmpty()) {
-                vlehrerV.setVisibility(View.GONE);
-            }else {
-                vlehrerV.setText(vlehrer);
-                vlehrerV.setVisibility(View.VISIBLE);
+            if(!raum.isEmpty()) {
+                vertretungListe.add(raum);
             }
 
-            if(raum.isEmpty()) {
-                raumV.setVisibility(View.GONE);
+            if(vertretungListe.isEmpty()) {
+                vertretungV.setVisibility(View.GONE);
             }else {
-                raumV.setText(raum);
-                raumV.setVisibility(View.VISIBLE);
+                vertretungV.setVisibility(View.VISIBLE);
+                String s = "";
+                for(int i = 0; i < vertretungListe.size(); i++) {
+                    s = s + vertretungListe.get(i);
+                    if(i < vertretungListe.size()-1)
+                        s = s + " / ";
+                }
+                vertretungV.setText(s);
             }
 
             if(bemerkung.isEmpty()) {

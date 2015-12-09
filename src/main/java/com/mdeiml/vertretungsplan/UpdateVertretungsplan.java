@@ -54,7 +54,8 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
                 tagValues.put("tag", datum);
                 tagValues.put("klasse", "all");
                 tagValues.put("stunde", 0);
-                tagValues.put("vlehrer", datumRaw);
+                tagValues.put("fach", datumRaw);
+                tagValues.put("vlehrer", "");
                 tagValues.put("vfach", "");
                 tagValues.put("raum", "");
                 tagValues.put("bemerkung", bitteBeachten);
