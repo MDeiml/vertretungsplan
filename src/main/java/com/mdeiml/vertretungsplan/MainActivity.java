@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             String vlehrer = cursor.getString(cursor.getColumnIndexOrThrow("vlehrer"));
             String raum = cursor.getString(cursor.getColumnIndexOrThrow("raum"));
             String bemerkung = cursor.getString(cursor.getColumnIndexOrThrow("bemerkung")).replaceAll("§", "\n");
+            String klasse = cursor.getString(cursor.getColumnIndexOrThrow("klasse"));
 
             LinearLayout pane = (LinearLayout)view.findViewById(R.id.vertretung_pane);
 
@@ -149,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 lp.leftMargin = (int)(20 * getResources().getDisplayMetrics().density);
                 pane.setLayoutParams(lp);
                 stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
-                klasseV.setText("Q11"); //TODO
+                klasseV.setText(klasse);
             }
 
             if(stunde == 0) {
