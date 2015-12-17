@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         if(ks != -1)
             update(); // den Vertretungsplan abrufen
         else
-            startActivityForResult(new Intent(this, SettingsActivity.class), 0);
+            startActivityForResult(new Intent(this, PasswordActivity.class), 1);
     }
 
     public void update() {
@@ -75,7 +75,12 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Bei neuen Einstellungen
         list.setAdapter(null);
-        new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
+        if(requestCode == 0)
+            new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
+        else if(requestCode == 1)
+            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
+        else
+            update();
     }
 
     private class LoadVertretungen extends AsyncTask<Void, Void, Cursor> {
@@ -150,7 +155,11 @@ public class MainActivity extends AppCompatActivity {
                 lp.leftMargin = (int)(20 * getResources().getDisplayMetrics().density);
                 pane.setLayoutParams(lp);
                 stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
+<<<<<<< HEAD
                 klasseV.setText(klasse);
+=======
+                klasseV.setText(klasse); //TODO
+>>>>>>> 750e6a497df6dbe07308749fe4bcb5e83591942e
             }
 
             if(stunde == 0) {
