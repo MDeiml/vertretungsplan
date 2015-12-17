@@ -155,11 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 lp.leftMargin = (int)(20 * getResources().getDisplayMetrics().density);
                 pane.setLayoutParams(lp);
                 stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
-<<<<<<< HEAD
                 klasseV.setText(klasse);
-=======
-                klasseV.setText(klasse); //TODO
->>>>>>> 750e6a497df6dbe07308749fe4bcb5e83591942e
             }
 
             if(stunde == 0) {
