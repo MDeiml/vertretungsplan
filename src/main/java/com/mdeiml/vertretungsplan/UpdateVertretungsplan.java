@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
 import android.util.Log;
 import java.text.SimpleDateFormat;
+import android.content.SharedPreferences;
 
 public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
 
@@ -28,11 +29,13 @@ public class UpdateVertretungsplan extends AsyncTask<Void, Void, Exception> {
     @Override
     protected Exception doInBackground(Void... v) {
         String url = c.getResources().getString(R.string.vp_url);
+        SharedPreferences pref = c.getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", c.MODE_PRIVATE);
+        String auth = pref.getString("auth", "");
         VertretungenOpenHelper openHelper = new VertretungenOpenHelper(c);
         SQLiteDatabase db = openHelper.getWritableDatabase();
         openHelper.reset(db);
         try {
-            Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic c2NodWVsZXI6d2ludGVyODYzMTY=").execute();
+            Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
             //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
             Document doc = response.parse();
 

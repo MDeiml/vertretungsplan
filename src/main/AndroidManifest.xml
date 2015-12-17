@@ -18,5 +18,8 @@
     <activity
       android:name="SettingsActivity"
       android:label="@string/einstellungen" />
+    <activity
+        android:name="PasswordActivity"
+        android:label="Passwort eingeben" />
   </application>
 </manifest>
