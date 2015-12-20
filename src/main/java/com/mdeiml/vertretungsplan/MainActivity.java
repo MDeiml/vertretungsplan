@@ -25,6 +25,7 @@ import android.util.Log;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
+import android.app.PendingIntent;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +49,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void update() {
-        new UpdateVertretungsplan(this, new LoadVertretungen()).execute();
+        new LoadVertretungen().execute();
+        PendingIntent pendingIntent = createPendingResult(0, new Intent(), PendingIntent.FLAG_ONE_SHOT);
+        Intent intent = NotificationService.createStartIntent(this);
+        intent.putExtra("callback", pendingIntent);
+        startService(intent);
     }
 
     @Override
@@ -79,8 +84,10 @@ public class MainActivity extends AppCompatActivity {
             new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
         else if(requestCode == 1)
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
-        else
+        else {
             update();
+            NotificationEventReceiver.setupAlarm(this);
+        }
     }
 
     private class LoadVertretungen extends AsyncTask<Void, Void, Cursor> {

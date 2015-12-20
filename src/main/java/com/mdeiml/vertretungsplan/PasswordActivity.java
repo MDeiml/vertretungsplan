@@ -29,7 +29,6 @@ public class PasswordActivity extends AppCompatActivity {
         });
     }
 
-    @Override
     public void save() {
         SharedPreferences prefs = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
         SharedPreferences.Editor edit = prefs.edit();
@@ -54,5 +53,5 @@ public class PasswordActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {}
-    
+
 }

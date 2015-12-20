@@ -17,10 +17,11 @@ public class VertretungenOpenHelper extends SQLiteOpenHelper {
                                                "vlehrer TEXT," +
                                                "vfach TEXT," +
                                                "raum TEXT," +
-                                               "bemerkung TEXT)";
+                                               "bemerkung TEXT," +
+                                               "old INTEGER)";
     private static final String DELETE_DATABASE = "DROP TABLE IF EXISTS "+TABLE_NAME;
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "Vertretungen.db";
 
     public VertretungenOpenHelper(Context context) {
