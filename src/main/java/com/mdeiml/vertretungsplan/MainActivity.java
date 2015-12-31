@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.LayoutInflater;
 import android.util.Log;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import android.app.PendingIntent;
 public class MainActivity extends AppCompatActivity {
 
     private ListView list;
+    private SwipeRefreshLayout refresh;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         list = (ListView)findViewById(R.id.vertretungen_list);
+        refresh = (SwipeRefreshLayout)findViewById(R.id.refresh);
+        refresh.setColorScheme(R.color.ColorPrimary);
 
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
         int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
@@ -50,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void update() {
         new LoadVertretungen().execute();
+        Log.i("MainActivity", "refresh");
+        refresh.post(new Runnable() {
+            @Override
+            public void run() {
+                refresh.setRefreshing(true);
+            }
+        });
         PendingIntent pendingIntent = createPendingResult(0, new Intent(), PendingIntent.FLAG_ONE_SHOT);
         Intent intent = NotificationService.createStartIntent(this);
         intent.putExtra("callback", pendingIntent);
@@ -80,9 +91,16 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Bei neuen Einstellungen
         list.setAdapter(null);
-        if(requestCode == 0)
+        if(requestCode == 0) {
             new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
-        else if(requestCode == 1)
+            Log.i("MainActivity", "refresh done");
+            refresh.post(new Runnable() {
+                @Override
+                public void run() {
+                    refresh.setRefreshing(false);
+                }
+            });
+        }else if(requestCode == 1)
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
         else {
             update();
@@ -125,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
     private class VertretungenAdapter extends CursorAdapter {
 
         public VertretungenAdapter(Cursor cursor) {
-            super(MainActivity.this, cursor, 0);
+            super(MainActivity.this, cursor, false);
         }
 
         @Override
@@ -179,15 +197,15 @@ public class MainActivity extends AppCompatActivity {
 
             ArrayList<String> vertretungListe = new ArrayList<>();
 
-            if(!vlehrer.isEmpty()) {
+            if(vlehrer.length() > 0) {
                 vertretungListe.add(vlehrer);
             }
 
-            if(!vfach.isEmpty()) {
+            if(vfach.length() > 0) {
                 vertretungListe.add(vfach);
             }
 
-            if(!raum.isEmpty()) {
+            if(raum.length() > 0) {
                 vertretungListe.add(raum);
             }
 
@@ -204,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 vertretungV.setText(s);
             }
 
-            if(bemerkung.isEmpty()) {
+            if(bemerkung.length() == 0) {
                 bemerkungV.setVisibility(View.GONE);
             }else {
                 bemerkungV.setText(bemerkung);

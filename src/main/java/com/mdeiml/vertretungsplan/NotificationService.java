@@ -144,6 +144,7 @@ public class NotificationService extends IntentService {
                     Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, null, null);
                     if(cursor.getCount() == 0)
                         newEntries++;
+                    cursor.close();
 
                     ContentValues values = new ContentValues();
                     values.put("tag", datum);
