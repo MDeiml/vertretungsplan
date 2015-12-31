@@ -15,12 +15,14 @@ import android.view.View.OnClickListener;
 import android.widget.TextView.SavedState;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.widget.CheckBox;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences pref; // Einstellungen
     private Spinner klassenstufe; // Klassenstufe (0 -> "5")
     private EditText klassenbuchstabe;
+    private CheckBox notifications;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE); // alte Einstellungen laden
         int klassenstufeI = pref.getInt("klassenstufe", 0); // Default: 5A
         String klassenbuchstabeS = pref.getString("klassenbuchstabe", "A");
+        boolean notificationsB = pref.getBoolean("notifications", true);
 
         klassenbuchstabe = (EditText)findViewById(R.id.klassenbuchstabe);
         klassenbuchstabe.setText(klassenbuchstabeS);
@@ -57,6 +60,9 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+        
+        notifications = (CheckBox)findViewById(R.id.setting_notification);
+        notifications.setChecked(notificationsB);
 
         Button ok = (Button)findViewById(R.id.einstellungen_ok);
         ok.setOnClickListener(new OnClickListener(){
@@ -71,10 +77,16 @@ public class SettingsActivity extends AppCompatActivity {
     public void save() {
         int ks = klassenstufe.getSelectedItemPosition();
         String kb = klassenbuchstabe.getText().toString();
+        boolean not = notifications.isChecked();
+        if(not)
+            NotificationEventReceiver.setupAlarm(this, 15);
+        else
+            NotificationEventReceiver.stopAlarm(this);
         // Einstellungen speichern
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("klassenstufe", ks);
         editor.putString("klassenbuchstabe", kb.toUpperCase());
+        editor.putBoolean("notifications", not);
         editor.commit();
         // neue Einstellungen an MainActivity übergeben
         Intent intent = new Intent();

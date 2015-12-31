@@ -8,6 +8,6 @@ public class NotificationServiceStartReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        NotificationEventReceiver.setupAlarm(context);
+        NotificationEventReceiver.setupAlarm(context, 0);
     }
 }

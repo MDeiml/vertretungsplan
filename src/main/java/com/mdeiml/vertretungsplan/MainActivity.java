@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
         else {
             update();
-            NotificationEventReceiver.setupAlarm(this);
+            NotificationEventReceiver.setupAlarm(this, 15);
         }
     }
 
