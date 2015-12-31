@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.mdeiml.vertretungsplan"
-  android:versionCode="1"
-  android:versionName="1.0" >
+  package="com.mdeiml.vertretungsplan" >
   <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLTED" />
+  <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
   <application android:label="@string/app_name"
       android:icon="@drawable/ic_launcher"
-      android:theme="@style/AppTheme" >
+      android:theme="@style/AppTheme"
+      android:allowBackup="true" >
     <activity
       android:name=".MainActivity"
       android:label="@string/app_name" >

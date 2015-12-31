@@ -5,6 +5,9 @@
     <string name="einstellungen">Einstellungen</string>
     <string name="klassenstufe">Klassenstufe</string>
     <string name="klassenbuchstabe">Klassenbuchstabe</string>
+    <string name="ok">OK</string>
+    <string name="benutzer">Benutzer</string>
+    <string name="passwort">Passwort</string>
     <string-array name="klassenstufen">
       <item>5</item>
       <item>6</item>
