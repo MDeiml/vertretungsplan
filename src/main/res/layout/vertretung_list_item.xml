@@ -17,6 +17,7 @@
         android:elevation="5dp"
         android:background="@color/Vertreten"
         android:padding="5dp"
+        android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:layout_marginTop="5dp">
         <TableLayout

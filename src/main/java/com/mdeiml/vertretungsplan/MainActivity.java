@@ -52,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
         list = (ListView)findViewById(R.id.vertretungen_list);
         refresh = (SwipeRefreshLayout)findViewById(R.id.refresh);
         refresh.setColorScheme(R.color.ColorPrimary);
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                update();
+            }
+        });
 
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
         int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
@@ -90,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.settings:
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivityForResult(intent,0); // Einstellungen aufrufen
+                return true;
+            case R.id.refresh_menu:
+                update();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -182,9 +191,6 @@ public class MainActivity extends AppCompatActivity {
             if(stunde == 0) {
                 stundeV.setText(fach);
                 klasseV.setText("");
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)pane.getLayoutParams();
-                lp.leftMargin = 0;
-                pane.setLayoutParams(lp);
             }else {
                 stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
                 klasseV.setText(klasse);
@@ -192,27 +198,28 @@ public class MainActivity extends AppCompatActivity {
 
             if(stunde == 0) {
                 pane.setBackgroundResource(R.color.Tag);
+                icon.setImageDrawable(null);
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
+                lp.leftMargin = 0;
+                icon.setLayoutParams(lp);
             }else if(vlehrer.trim().equals("entfällt")) {
                 pane.setBackgroundResource(R.color.Entfaellt);
+                icon.setImageDrawable(entfaellt_ic);
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
                 lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
-                lp.rightMargin = (int)(5 * getResources().getDisplayMetrics().density);
                 icon.setLayoutParams(lp);
-                icon.setImageDrawable(entfaellt_ic);
             }else if(bemerkung.equals("Raumänderung")) {
                 pane.setBackgroundResource(R.color.Raumaenderung);
+                icon.setImageDrawable(raumaenderung_ic);
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
                 lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
-                lp.rightMargin = (int)(5 * getResources().getDisplayMetrics().density);
                 icon.setLayoutParams(lp);
-                icon.setImageDrawable(raumaenderung_ic);
             }else {
                 pane.setBackgroundResource(R.color.Vertreten);
+                icon.setImageDrawable(vertreten_ic);
                 ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
                 lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
-                lp.rightMargin = (int)(5 * getResources().getDisplayMetrics().density);
                 icon.setLayoutParams(lp);
-                icon.setImageDrawable(vertreten_ic);
             }
 
             Log.i("MainActivity", stunde+", "+fach);
