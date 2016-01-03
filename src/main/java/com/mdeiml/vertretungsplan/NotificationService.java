@@ -177,7 +177,7 @@ public class NotificationService extends IntentService {
                .setAutoCancel(true)
                .setColor(getResources().getColor(R.color.ColorPrimary))
                .setContentText(newEntries + " neue Vertretungen")
-               .setSmallIcon(android.R.drawable.stat_notify_missed_call);
+               .setSmallIcon(R.drawable.ic_notification);
         PendingIntent intent = PendingIntent.getActivity(this, NOTIFICATION_ID, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(intent);
         builder.setDeleteIntent(NotificationEventReceiver.getStopIntent(this));
