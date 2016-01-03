@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.ListView;
 import android.widget.LinearLayout;
@@ -27,11 +28,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
 import android.app.PendingIntent;
+import android.graphics.drawable.Drawable;
 
 public class MainActivity extends AppCompatActivity {
 
     private ListView list;
     private SwipeRefreshLayout refresh;
+    private Drawable entfaellt_ic;
+    private Drawable raumaenderung_ic;
+    private Drawable vertreten_ic;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main);
         Toolbar toolbar = (Toolbar)findViewById(R.id.main_toolbar);
         setSupportActionBar(toolbar);
+
+        entfaellt_ic = getResources().getDrawable(R.drawable.ic_event_busy_black_24dp);
+        vertreten_ic = getResources().getDrawable(R.drawable.ic_sync_black_24dp);
+        raumaenderung_ic = getResources().getDrawable(R.drawable.ic_swap_horiz_black_24dp);
 
         list = (ListView)findViewById(R.id.vertretungen_list);
         refresh = (SwipeRefreshLayout)findViewById(R.id.refresh);
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
             TextView klasseV = (TextView)view.findViewById(R.id.vertretung_klasse);
             TextView vertretungV = (TextView)view.findViewById(R.id.vertretung);
             TextView bemerkungV = (TextView)view.findViewById(R.id.vertretung_bemerkung);
+            ImageView icon = (ImageView)view.findViewById(R.id.vertretung_icon);
 
             int stunde = cursor.getInt(cursor.getColumnIndexOrThrow("stunde"));
             String lehrer = cursor.getString(cursor.getColumnIndexOrThrow("lehrer"));
@@ -176,9 +186,6 @@ public class MainActivity extends AppCompatActivity {
                 lp.leftMargin = 0;
                 pane.setLayoutParams(lp);
             }else {
-                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)pane.getLayoutParams();
-                lp.leftMargin = (int)(20 * getResources().getDisplayMetrics().density);
-                pane.setLayoutParams(lp);
                 stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
                 klasseV.setText(klasse);
             }
@@ -187,10 +194,25 @@ public class MainActivity extends AppCompatActivity {
                 pane.setBackgroundResource(R.color.Tag);
             }else if(vlehrer.trim().equals("entfällt")) {
                 pane.setBackgroundResource(R.color.Entfaellt);
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
+                lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
+                lp.rightMargin = (int)(5 * getResources().getDisplayMetrics().density);
+                icon.setLayoutParams(lp);
+                icon.setImageDrawable(entfaellt_ic);
             }else if(bemerkung.equals("Raumänderung")) {
                 pane.setBackgroundResource(R.color.Raumaenderung);
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
+                lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
+                lp.rightMargin = (int)(5 * getResources().getDisplayMetrics().density);
+                icon.setLayoutParams(lp);
+                icon.setImageDrawable(raumaenderung_ic);
             }else {
                 pane.setBackgroundResource(R.color.Vertreten);
+                ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams)icon.getLayoutParams();
+                lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
+                lp.rightMargin = (int)(5 * getResources().getDisplayMetrics().density);
+                icon.setLayoutParams(lp);
+                icon.setImageDrawable(vertreten_ic);
             }
 
             Log.i("MainActivity", stunde+", "+fach);
