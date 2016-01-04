@@ -72,6 +72,8 @@ public class NotificationService extends IntentService {
         String url = getResources().getString(R.string.vp_url);
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
         String auth = pref.getString("auth", "");
+        int ks = pref.getInt("klassenstufe", 0);
+        String kb = pref.getString("klassenbuchstabe", "A");
         VertretungenOpenHelper openHelper = new VertretungenOpenHelper(this);
         SQLiteDatabase db = openHelper.getWritableDatabase();
         ContentValues oldValues = new ContentValues();
@@ -130,21 +132,23 @@ public class NotificationService extends IntentService {
                     String raum = children.get(5).ownText();
                     String bemerkung = children.get(6).ownText();
 
-                    String[] projection = new String[] {};
-                    String selection = "tag='"+datum+"' AND "+
-                                       "klasse='"+klasse+"' AND "+
-                                       "stunde="+stundeI+" AND "+
-                                       "lehrer='"+lehrer+"' AND "+
-                                       "fach='"+fach+"' AND "+
-                                       "vlehrer='"+vlehrer+"' AND "+
-                                       "vfach='"+vfach+"' AND "+
-                                       "raum='"+raum+"' AND "+
-                                       "bemerkung='"+bemerkung+"' AND "+
-                                       "old=1";
-                    Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, null, null);
-                    if(cursor.getCount() == 0)
-                        newEntries++;
-                    cursor.close();
+                    if(klasse.equals("all") || (klasse.startsWith(""+(ks+5)) && klasse.contains(kb))) {
+                        String[] projection = new String[] {};
+                        String selection = "tag='" + datum + "' AND " +
+                            "klasse='" + klasse + "' AND " +
+                            "stunde=" + stundeI + " AND " +
+                            "lehrer='" + lehrer + "' AND " +
+                            "fach='" + fach + "' AND " +
+                            "vlehrer='" + vlehrer + "' AND " +
+                            "vfach='" + vfach + "' AND " +
+                            "raum='" + raum + "' AND " +
+                            "bemerkung='" + bemerkung + "' AND " +
+                            "old=1";
+                        Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, null, null);
+                        if(cursor.getCount() == 0)
+                            newEntries++;
+                        cursor.close();
+                    }
 
                     ContentValues values = new ContentValues();
                     values.put("tag", datum);
