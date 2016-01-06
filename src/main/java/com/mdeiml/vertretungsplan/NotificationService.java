@@ -50,14 +50,14 @@ public class NotificationService extends IntentService {
                 Log.i("NotificationService", "Vertretungen werden geladen...");
                 int newEntries = -1;
                 try {
-                    newEntries = updateVertretungen();
+                    newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
                 }catch(IOException e) {
-                    Log.e("NotificationService", "", e);
+                    Log.e("NotificationService", "", e); // Kein Internetverbindung
                 }
                 Log.i("NotificationService", newEntries+" neue Einträge");
                 PendingIntent pendingIntent = (PendingIntent)intent.getParcelableExtra("callback");
-                if(pendingIntent != null) {
-                    if(newEntries == -1) {
+                if(pendingIntent != null) { // Von Activity aufgerufen
+                    if(newEntries == -1) { // Keine Verbindung
                         Toast.makeText(this, "Vertretungen konnten nicht geladen werden", Toast.LENGTH_LONG).show();
                     }else {
                         Log.i("NotificationService", "MainActivity sollte jetzt Vertretungen anzeigen");
@@ -67,7 +67,7 @@ public class NotificationService extends IntentService {
                             Log.e("NotificationService", null, e);
                         }
                     }
-                }else {
+                }else { // Läuft im Hintergrund
                     if(newEntries > 0)
                         startNotification(newEntries);
                 }
@@ -85,15 +85,18 @@ public class NotificationService extends IntentService {
         String auth = pref.getString("auth", "");
         VertretungenOpenHelper openHelper = new VertretungenOpenHelper(this);
         SQLiteDatabase db = openHelper.getWritableDatabase();
+        // Alte Einträge markieren
         ContentValues oldValues = new ContentValues();
         oldValues.put("old", 1);
         db.update(VertretungenOpenHelper.TABLE_NAME, oldValues, null, null);
-        int newEntries = 0;
 
+        int newEntries = 0;
+        // Seite Abrufen
         Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
         //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
         Document doc = response.parse();
 
+        // Auslesen der Seite
         Elements tageE = doc.select("div");
         for(Element tagE : tageE) {
             String datumRaw = tagE.select("td.Datum").get(0).ownText();
