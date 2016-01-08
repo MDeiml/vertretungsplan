@@ -1,21 +1,17 @@
 package com.mdeiml.vertretungsplan;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
-import android.content.SharedPreferences;
+import android.widget.*;
+
 import android.content.Intent;
-import android.widget.Button;
-import android.view.View.OnClickListener;
-import android.widget.TextView.SavedState;
+import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.widget.CheckBox;
+import android.util.Base64;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
+import java.io.UnsupportedEncodingException;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -23,6 +19,8 @@ public class SettingsActivity extends AppCompatActivity {
     private Spinner klassenstufe; // Klassenstufe (0 -> "5")
     private EditText klassenbuchstabe;
     private CheckBox notifications;
+    private EditText benutzername;
+    private EditText passwort;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +62,9 @@ public class SettingsActivity extends AppCompatActivity {
         notifications = (CheckBox)findViewById(R.id.setting_notification);
         notifications.setChecked(notificationsB);
 
+        benutzername = (EditText)findViewById(R.id.benutzername);
+        passwort = (EditText)findViewById(R.id.passwort);
+        
         Button ok = (Button)findViewById(R.id.einstellungen_ok);
         ok.setOnClickListener(new OnClickListener(){
             @Override
@@ -81,12 +82,20 @@ public class SettingsActivity extends AppCompatActivity {
         if(not)
             NotificationEventReceiver.setupAlarm(this, 15);
         else
-            NotificationEventReceiver.stopAlarm(this);
+            NotificationEventReceiver.stopAlarm(this);SharedPreferences prefs = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        String b = benutzername.getText().toString();
+        String p = passwort.getText().toString();
+        String auth = b+":"+p+"86316";
+        String a = "";
+        try {
+            a = Base64.encodeToString(auth.getBytes("UTF-8"), Base64.NO_WRAP);
+        } catch(UnsupportedEncodingException e) {}
         // Einstellungen speichern
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("klassenstufe", ks);
         editor.putString("klassenbuchstabe", kb.toUpperCase());
         editor.putBoolean("notifications", not);
+        editor.putString("auth", a);
         editor.commit();
         // neue Einstellungen an MainActivity übergeben
         Intent intent = new Intent();
