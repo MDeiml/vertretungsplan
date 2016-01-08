@@ -21,6 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
     private CheckBox notifications;
     private EditText benutzername;
     private EditText passwort;
+    private EditText url; 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         int klassenstufeI = pref.getInt("klassenstufe", 0); // Default: 5A
         String klassenbuchstabeS = pref.getString("klassenbuchstabe", "A");
         boolean notificationsB = pref.getBoolean("notifications", true);
+        String urlS = pref.getString("url", getResources().getString(R.string.vp_url));
 
         klassenbuchstabe = (EditText)findViewById(R.id.klassenbuchstabe);
         klassenbuchstabe.setText(klassenbuchstabeS);
@@ -64,6 +66,8 @@ public class SettingsActivity extends AppCompatActivity {
 
         benutzername = (EditText)findViewById(R.id.benutzername);
         passwort = (EditText)findViewById(R.id.passwort);
+        url = (EditText)findViewById(R.id.url);
+        url.setText(urlS);
         
         Button ok = (Button)findViewById(R.id.einstellungen_ok);
         ok.setOnClickListener(new OnClickListener(){
@@ -78,24 +82,28 @@ public class SettingsActivity extends AppCompatActivity {
     public void save() {
         int ks = klassenstufe.getSelectedItemPosition();
         String kb = klassenbuchstabe.getText().toString();
+        String urlS = url.getText().toString();
         boolean not = notifications.isChecked();
         if(not)
             NotificationEventReceiver.setupAlarm(this, 15);
         else
             NotificationEventReceiver.stopAlarm(this);SharedPreferences prefs = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = pref.edit();
         String b = benutzername.getText().toString();
         String p = passwort.getText().toString();
-        String auth = b+":"+p+"86316";
-        String a = "";
-        try {
-            a = Base64.encodeToString(auth.getBytes("UTF-8"), Base64.NO_WRAP);
-        } catch(UnsupportedEncodingException e) {}
-        // Einstellungen speichern
-        SharedPreferences.Editor editor = pref.edit();
+        if((!b.isEmpty()) && (!p.isEmpty())) {
+            String auth = b+":"+p+"86316";
+            String a = "";
+            try {
+                a = Base64.encodeToString(auth.getBytes("UTF-8"), Base64.NO_WRAP);
+            } catch(UnsupportedEncodingException e) {}
+            editor.putString("auth", a);
+        }
+        editor.putString("url", urlS);
         editor.putInt("klassenstufe", ks);
         editor.putString("klassenbuchstabe", kb.toUpperCase());
         editor.putBoolean("notifications", not);
-        editor.putString("auth", a);
         editor.commit();
         // neue Einstellungen an MainActivity übergeben
         Intent intent = new Intent();

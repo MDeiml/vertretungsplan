@@ -101,6 +101,23 @@
               android:id="@+id/passwort"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
+              android:inputType="textPassword" />
+      </TableRow>
+      <TableRow
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_margin="5dp">
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="URL: "
+              android:paddingRight="5dp"/>
+          <EditText
+              android:textColor="#000000"
+              android:id="@+id/url"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
               android:inputType="textCapWords" />
       </TableRow>
   </TableLayout>
