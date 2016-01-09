@@ -53,12 +53,16 @@ public class NotificationService extends IntentService {
                     newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
                 }catch(IOException e) {
                     Log.e("NotificationService", "", e); // Kein Internetverbindung
+                    if(e.getMessage().contains("response code: 401"))
+                        newEntries = -2;
                 }
                 Log.i("NotificationService", newEntries+" neue Einträge");
                 PendingIntent pendingIntent = (PendingIntent)intent.getParcelableExtra("callback");
                 if(pendingIntent != null) { // Von Activity aufgerufen
                     if(newEntries == -1) { // Keine Verbindung
                         Toast.makeText(this, "Vertretungen konnten nicht geladen werden", Toast.LENGTH_LONG).show();
+                    }else if(newEntries == -1) { // Falscher Benutzername/Passwort
+                        Toast.makeText(this, "Falsches Passwort! Bitte ändern sie das Passwort in den Einstellungen", Toast.LENGTH_LONG).show();
                     }else {
                         Log.i("NotificationService", "MainActivity sollte jetzt Vertretungen anzeigen");
                         try {
@@ -80,8 +84,8 @@ public class NotificationService extends IntentService {
     }
 
     private int updateVertretungen() throws IOException {
-        String url = getResources().getString(R.string.vp_url);
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        String url = pref.getString("url", getResources().getString(R.string.vp_url));
         String auth = pref.getString("auth", "");
         int ks = pref.getInt("klassenstufe", 0);
         String kb = pref.getString("klassenbuchstabe", "A");

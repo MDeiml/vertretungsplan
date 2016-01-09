@@ -93,7 +93,7 @@ public class SettingsActivity extends AppCompatActivity {
         String b = benutzername.getText().toString();
         String p = passwort.getText().toString();
         if((!b.isEmpty()) && (!p.isEmpty())) {
-            String auth = b+":"+p+"86316";
+            String auth = b+":"+p;
             String a = "";
             try {
                 a = Base64.encodeToString(auth.getBytes("UTF-8"), Base64.NO_WRAP);
