@@ -93,7 +93,7 @@ public class NotificationService extends IntentService {
         int newEntries = 0;
         // Seite Abrufen
         Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
-        if(response.statusCode == 401) {
+        if(response.statusCode() == 401) {
             return -2;
         }
         //TODO nur parsen, wenn neuer Vertretungsplan vorhanden

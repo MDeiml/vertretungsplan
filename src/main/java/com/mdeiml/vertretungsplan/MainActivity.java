@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vertretungen konnten nicht geladen werden", Toast.LENGTH_LONG).show();
             }else if(ne == -2) {
                 Toast.makeText(this, "Passwort nicht korrekt! Bitte richtiges Passwort in den Einstellungen festlegen", Toast.LENGTH_LONG).show();
+            }
             new LoadVertretungen().execute(); // Vertretungsplan aktualisieren
             Log.i("MainActivity", "refresh done");
             refresh.post(new Runnable() {
