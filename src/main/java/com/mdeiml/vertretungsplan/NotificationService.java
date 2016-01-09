@@ -48,11 +48,14 @@ public class NotificationService extends IntentService {
             String action = intent.getAction();
             if(action.equals(ACTION_START)) {
                 Log.i("NotificationService", "Vertretungen werden geladen...");
-                int newEntries = -1;
+                int newEntries = -2;
+                String test = "";
                 try {
                     newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
                 }catch(IOException e) {
                     Log.e("NotificationService", "", e); // Kein Internetverbindung
+                    if(e.getMessage().startsWith("Unable to resolve host"))
+                        newEntries = -1;
                 }
                 Log.i("NotificationService", newEntries+" neue Einträge");
                 PendingIntent pendingIntent = intent.getParcelableExtra("callback");
@@ -61,6 +64,7 @@ public class NotificationService extends IntentService {
                     try {
                         Intent i = new Intent();
                         i.putExtra("newEntries", newEntries);
+                        i.putExtra("a", test);
                         pendingIntent.send(this, MainActivity.RESULT_OK, i);
                     }catch (PendingIntent.CanceledException e) {
                         Log.e("NotificationService", null, e);
@@ -93,9 +97,7 @@ public class NotificationService extends IntentService {
         int newEntries = 0;
         // Seite Abrufen
         Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
-        if(response.statusCode() == 401) {
-            return -2;
-        }
+        
         //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
         Document doc = response.parse();
 
