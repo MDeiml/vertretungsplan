@@ -53,23 +53,19 @@ public class NotificationService extends IntentService {
                     newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
                 }catch(IOException e) {
                     Log.e("NotificationService", "", e); // Kein Internetverbindung
-                    if(e.getMessage().contains("response code: 401"))
+                    if(e.getMessage().contains(" 401"))
                         newEntries = -2;
                 }
                 Log.i("NotificationService", newEntries+" neue Einträge");
-                PendingIntent pendingIntent = (PendingIntent)intent.getParcelableExtra("callback");
+                PendingIntent pendingIntent = intent.getParcelableExtra("callback");
                 if(pendingIntent != null) { // Von Activity aufgerufen
-                    if(newEntries == -1) { // Keine Verbindung
-                        Toast.makeText(this, "Vertretungen konnten nicht geladen werden", Toast.LENGTH_LONG).show();
-                    }else if(newEntries == -1) { // Falscher Benutzername/Passwort
-                        Toast.makeText(this, "Falsches Passwort! Bitte ändern sie das Passwort in den Einstellungen", Toast.LENGTH_LONG).show();
-                    }else {
-                        Log.i("NotificationService", "MainActivity sollte jetzt Vertretungen anzeigen");
-                        try {
-                            pendingIntent.send();
-                        }catch (PendingIntent.CanceledException e) {
-                            Log.e("NotificationService", null, e);
-                        }
+                    Log.i("NotificationService", "MainActivity sollte jetzt Vertretungen anzeigen");
+                    try {
+                        Intent i = new Intent();
+                        i.putExtra("newEntries", newEntries);
+                        pendingIntent.send(this, MainActivity.RESULT_OK, i);
+                    }catch (PendingIntent.CanceledException e) {
+                        Log.e("NotificationService", null, e);
                     }
                 }else { // Läuft im Hintergrund
                     if(newEntries > 0)
