@@ -53,8 +53,6 @@ public class NotificationService extends IntentService {
                     newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
                 }catch(IOException e) {
                     Log.e("NotificationService", "", e); // Kein Internetverbindung
-                    if(e.getMessage().contains(" 401"))
-                        newEntries = -2;
                 }
                 Log.i("NotificationService", newEntries+" neue Einträge");
                 PendingIntent pendingIntent = intent.getParcelableExtra("callback");
@@ -95,6 +93,9 @@ public class NotificationService extends IntentService {
         int newEntries = 0;
         // Seite Abrufen
         Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
+        if(response.statusCode == 401) {
+            return -2;
+        }
         //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
         Document doc = response.parse();
 
