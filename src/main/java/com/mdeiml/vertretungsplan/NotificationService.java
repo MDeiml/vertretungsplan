@@ -204,6 +204,10 @@ public class NotificationService extends IntentService {
     }
 
     private void deleteNotification() {
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("newEntries", 0);
+        editor.commit();
         final NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancelAll();
     }
