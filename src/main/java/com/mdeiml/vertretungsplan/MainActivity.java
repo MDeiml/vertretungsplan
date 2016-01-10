@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         PendingIntent pendingIntent = createPendingResult(0, new Intent(), PendingIntent.FLAG_ONE_SHOT);
-        Intent intent = NotificationService.createStartIntent(this);
+        Intent intent = NotificationService.createStopIntent(this);
         intent.putExtra("callback", pendingIntent);
         startService(intent);
     }

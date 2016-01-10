@@ -46,34 +46,31 @@ public class NotificationService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         try {
             String action = intent.getAction();
+            Log.i("NotificationService", "Vertretungen werden geladen...");
+            int newEntries = -2;
+            String test = "";
+            try {
+                newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
+            }catch(IOException e) {
+                Log.e("NotificationService", "", e); // Kein Internetverbindung
+                if(e.getMessage().startsWith("Unable to resolve host"))
+                    newEntries = -1;
+            }
+            Log.i("NotificationService", newEntries+" neue Einträge");
             if(action.equals(ACTION_START)) {
-                Log.i("NotificationService", "Vertretungen werden geladen...");
-                int newEntries = -2;
-                String test = "";
-                try {
-                    newEntries = updateVertretungen(); // Anzahl neuer Einträge für Filteroptionen
-                }catch(IOException e) {
-                    Log.e("NotificationService", "", e); // Kein Internetverbindung
-                    if(e.getMessage().startsWith("Unable to resolve host"))
-                        newEntries = -1;
-                }
-                Log.i("NotificationService", newEntries+" neue Einträge");
-                PendingIntent pendingIntent = intent.getParcelableExtra("callback");
-                if(pendingIntent != null) { // Von Activity aufgerufen
-                    Log.i("NotificationService", "MainActivity sollte jetzt Vertretungen anzeigen");
-                    try {
-                        Intent i = new Intent();
-                        i.putExtra("newEntries", newEntries);
-                        i.putExtra("a", test);
-                        pendingIntent.send(this, MainActivity.RESULT_OK, i);
-                    }catch (PendingIntent.CanceledException e) {
-                        Log.e("NotificationService", null, e);
-                    }
-                }else { // Läuft im Hintergrund
-                    if(newEntries > 0)
-                        startNotification(newEntries);
-                }
+                if(newEntries > 0)
+                    startNotification(newEntries);
             }else if(action.equals(ACTION_STOP)) {
+                PendingIntent pendingIntent = intent.getParcelableExtra("callback");
+                Log.i("NotificationService", "MainActivity sollte jetzt Vertretungen anzeigen");
+                try {
+                    Intent i = new Intent();
+                    i.putExtra("newEntries", newEntries);
+                    i.putExtra("a", test);
+                    pendingIntent.send(this, MainActivity.RESULT_OK, i);
+                }catch (PendingIntent.CanceledException e) {
+                    Log.e("NotificationService", null, e);
+                }
                 deleteNotification();
             }
         }finally {
@@ -187,6 +184,8 @@ public class NotificationService extends IntentService {
     }
 
     private void startNotification(int newEntries) {
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        newEntries += pref.getInt("newEntries", 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentTitle("Neue Vertretung")
                .setAutoCancel(true)
@@ -198,10 +197,15 @@ public class NotificationService extends IntentService {
         builder.setDeleteIntent(NotificationEventReceiver.getStopIntent(this));
         final NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(NOTIFICATION_ID, builder.build());
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt("newEntries", newEntries);
+        editor.commit();
     }
 
     private void deleteNotification() {
-
+        final NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancelAll();
     }
 
 }
