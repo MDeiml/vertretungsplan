@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         if(ks != -1)
             update(); // den Vertretungsplan abrufen
         else
-            startActivityForResult(new Intent(this, PasswordActivity.class), 1);
+            startActivityForResult(new Intent(this, SettingsActivity.class), 1);
     }
 
     public void update() {
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(this, SettingsActivity.class), 2);
         else {
             update();
-            NotificationEventReceiver.setupAlarm(this, 15);
+            // NotificationEventReceiver.setupAlarm(this, 15);
         }
     }
 

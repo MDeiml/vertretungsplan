@@ -194,7 +194,7 @@ public class NotificationService extends IntentService {
                .setSmallIcon(R.drawable.ic_notification);
         PendingIntent intent = PendingIntent.getActivity(this, NOTIFICATION_ID, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(intent);
-        builder.setDeleteIntent(NotificationEventReceiver.getStopIntent(this));
+        // builder.setDeleteIntent(NotificationEventReceiver.getStopIntent(this));
         final NotificationManager manager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(NOTIFICATION_ID, builder.build());
 
