@@ -19,16 +19,24 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("releasekey.keystore")
+            storePassword System.console().readLine("\nKeystore password: ")
+            keyAlias "vert_key"
+            keyPassword System.console().readLine("\nKey password: ")
+        }
+    }
+
     lintOptions {
         abortOnError false
     }
 
-    //buildTypes {
-    //    release {
-    //        runProguard false
-    //        proguardFile getDefaultProguardFile('proguard-android.txt')
-    //    }
-    //}
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
 }
 
 dependencies {
