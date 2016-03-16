@@ -10,3 +10,4 @@ Eine Android App für den [Online Vertreungsplan des Gymnasium Friedberg](http:/
 
 * Kurse(Checkboxes)
 * mehrere Klassen
+* bessere Filteroptionen
