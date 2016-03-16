@@ -3,14 +3,14 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 'android-23'
-    buildToolsVersion '21.1.2'
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         minSdkVersion 8
@@ -19,27 +19,13 @@ android {
         versionName "1.0"
     }
 
-    signingConfigs {
-        release {
-            storeFile file("releasekey.keystore")
-            storePassword System.console().readLine("\nKeystore password: ")
-            keyAlias "vert_key"
-            keyPassword System.console().readLine("\nKey password: ")
-        }
-    }
-
     lintOptions {
         abortOnError false
     }
 
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.2.1'
 }
