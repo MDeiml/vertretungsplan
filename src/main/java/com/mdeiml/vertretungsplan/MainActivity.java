@@ -138,14 +138,13 @@ public class MainActivity extends AppCompatActivity {
         public Cursor doInBackground(Void... v) {
             try {
                 SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
-                int ksI = pref.getInt("klassenstufe", 0); //Default: 5. Klasse
-                String ks = getResources().getStringArray(R.array.klassenstufen)[ksI];
-                String kb = pref.getString("klassenbuchstabe", "A");
+                String lehrer = pref.getString("lehrer", "");
+                String vlehrer = pref.getString("lehrer_full", "");
 
                 VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
                 SQLiteDatabase db = openHelper.getReadableDatabase();
                 String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "fach", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
-                String selection = "klasse == 'all' OR (klasse LIKE '"+ks+"%' AND klasse LIKE '%"+kb+"%')";
+                String selection = "klasse == 'all' OR (lehrer == '"+lehrer+"' OR vlehrer == '"+vlehrer+"')";
                 String orderBy = "date(tag), stunde";
                 Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, orderBy, null);
                 Log.i("MainActivity", cursor.getCount()+" Vertretungen geladen");

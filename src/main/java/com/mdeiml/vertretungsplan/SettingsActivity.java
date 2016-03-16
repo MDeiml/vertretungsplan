@@ -16,8 +16,8 @@ import java.io.UnsupportedEncodingException;
 public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences pref; // Einstellungen
-    private Spinner klassenstufe; // Klassenstufe (0 -> "5")
-    private EditText klassenbuchstabe;
+    private EditText lehrer;
+    private EditText vlehrer;
     // private CheckBox notifications;
     private EditText benutzername;
     private EditText passwort;
@@ -30,36 +30,16 @@ public class SettingsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.settings_toolbar);
         setSupportActionBar(toolbar);
         pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE); // alte Einstellungen laden
-        int klassenstufeI = pref.getInt("klassenstufe", 0); // Default: 5A
-        String klassenbuchstabeS = pref.getString("klassenbuchstabe", "A");
+        String vlehrerS = pref.getString("lehrer_full", ""); // Default: 5A
+        String lehrerS = pref.getString("lehrer", "");
         boolean notificationsB = pref.getBoolean("notifications", true);
         String urlS = pref.getString("url", getResources().getString(R.string.vp_url));
 
-        klassenbuchstabe = (EditText)findViewById(R.id.klassenbuchstabe);
-        klassenbuchstabe.setText(klassenbuchstabeS);
-        if(klassenstufeI > 5) {
-            klassenbuchstabe.setEnabled(false);
-        }
+        lehrer = (EditText)findViewById(R.id.lehrer);
+        lehrer.setText(lehrerS);
 
-        klassenstufe = (Spinner)findViewById(R.id.klassenstufe);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.klassenstufen, R.layout.spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        klassenstufe.setAdapter(adapter);
-        klassenstufe.setSelection(klassenstufeI);
-        klassenstufe.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                if(pos > 5) { // Für Q11 und Q12 Eingabe des Buchstaben sperren
-                    klassenbuchstabe.setText("");
-                    klassenbuchstabe.setEnabled(false);
-                }else {
-                    klassenbuchstabe.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+        vlehrer = (EditText)findViewById(R.id.lehrer_full);
+        vlehrer.setText(vlehrerS);
         
         /* notifications = (CheckBox)findViewById(R.id.setting_notification);
         notifications.setChecked(notificationsB); */
@@ -80,15 +60,14 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public void save() {
-        int ks = klassenstufe.getSelectedItemPosition();
-        String kb = klassenbuchstabe.getText().toString();
+        String lehrerS = lehrer.getText().toString();
+        String vlehrerS = vlehrer.getText().toString();
         String urlS = url.getText().toString();
         /* boolean not = notifications.isChecked();
         if(not)
             NotificationEventReceiver.setupAlarm(this, 15);
         else
             NotificationEventReceiver.stopAlarm(this); */
-        SharedPreferences prefs = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
 
         SharedPreferences.Editor editor = pref.edit();
         String b = benutzername.getText().toString();
@@ -102,8 +81,8 @@ public class SettingsActivity extends AppCompatActivity {
             editor.putString("auth", a);
         }
         editor.putString("url", urlS);
-        editor.putInt("klassenstufe", ks);
-        editor.putString("klassenbuchstabe", kb.toUpperCase());
+        editor.putString("lehrer", lehrerS);
+        editor.putString("lehrer_full", vlehrerS);
         // editor.putBoolean("notifications", not);
         editor.commit();
         // neue Einstellungen an MainActivity übergeben

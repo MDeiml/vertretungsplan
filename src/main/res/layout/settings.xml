@@ -26,12 +26,14 @@
       <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/klassenstufe" />
+        android:text="Kürzel" />
 
-      <Spinner
-        android:id="@+id/klassenstufe"
+      <EditText
+        android:textColor="#000000"
+        android:id="@+id/lehrer"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:inputType="textCapWords"/>
 
     </TableRow>
 
@@ -43,11 +45,11 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="@string/klassenbuchstabe"
+          android:text="Ganzer Name"
           android:paddingRight="5dp"/>
       <EditText
         android:textColor="#000000"
-        android:id="@+id/klassenbuchstabe"
+        android:id="@+id/lehrer_full"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textCapWords" />
