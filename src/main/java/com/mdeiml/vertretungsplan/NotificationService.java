@@ -94,7 +94,7 @@ public class NotificationService extends IntentService {
         int newEntries = 0;
         // Seite Abrufen
         Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
-        
+
         //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
         Document doc = response.parse();
 
@@ -141,7 +141,7 @@ public class NotificationService extends IntentService {
                 String[] lehrerFach = children.get(2).ownText().split(" / ");
                 String lehrer = lehrerFach[0];
                 String fach = lehrerFach[1];
-                String vlehrer = children.get(3).ownText();
+                String vlehrer = children.get(3).ownText().replaceAll(",","");
                 String vfach = children.get(4).ownText();
                 String raum = children.get(5).ownText();
                 String bemerkung = children.get(6).ownText();
