@@ -135,15 +135,14 @@ public class NotificationService extends IntentService {
             for(Element vertretungE : vertretungenE) {
                 Elements children = vertretungE.children();
 
-                String klasse = children.get(0).ownText();
+                String klasse = children.get(2).ownText();
                 String stundeS = children.get(1).ownText();
                 int stundeI = Integer.parseInt(stundeS.substring(stundeS.indexOf(" ")+1, stundeS.indexOf(".")));
-                String[] lehrerFach = children.get(2).ownText().split(" / ");
-                String lehrer = lehrerFach[0];
-                String fach = lehrerFach[1];
-                String vlehrer = children.get(3).ownText();
-                String vfach = children.get(4).ownText();
-                String raum = children.get(5).ownText();
+                String lehrer = children.get(5).ownText();
+                String fach = "";
+                String vlehrer = children.get(0).ownText();
+                String vfach = children.get(3).ownText();
+                String raum = children.get(4).ownText();
                 String bemerkung = children.get(6).ownText();
 
                 if(klasse.equals("all") || (klasse.startsWith(""+(ks+5)) && klasse.contains(kb))) {

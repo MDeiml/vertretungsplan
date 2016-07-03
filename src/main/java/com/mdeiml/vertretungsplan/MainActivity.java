@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
                 SQLiteDatabase db = openHelper.getReadableDatabase();
                 String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "fach", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
-                String selection = "klasse == 'all' OR (lehrer == '"+lehrer+"' OR vlehrer == '"+vlehrer+"')";
+                String selection = "klasse == 'all' OR (lehrer == '"+lehrer+"' OR vlehrer == '"+lehrer+"')";
                 String orderBy = "date(tag), stunde";
                 Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, orderBy, null);
                 Log.i("MainActivity", cursor.getCount()+" Vertretungen geladen");
