@@ -94,7 +94,7 @@ public class NotificationService extends IntentService {
         int newEntries = 0;
         // Seite Abrufen
         Connection.Response response = Jsoup.connect(url).header("Authorization", "Basic "+auth).execute();
-        
+
         //TODO nur parsen, wenn neuer Vertretungsplan vorhanden
         Document doc = response.parse();
 
