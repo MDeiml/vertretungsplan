@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
-        int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
-        if(ks != -1)
+        String lehrer = pref.getString("lehrer", null); // Default: -1 -> Einstellungen aufrufen
+        if(lehrer != null)
             update(); // den Vertretungsplan abrufen
         else
             startActivityForResult(new Intent(this, SettingsActivity.class), 1);
