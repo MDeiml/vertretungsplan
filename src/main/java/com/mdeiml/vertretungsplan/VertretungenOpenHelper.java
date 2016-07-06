@@ -13,7 +13,6 @@ public class VertretungenOpenHelper extends SQLiteOpenHelper {
                                                "klasse TEXT," +
                                                "stunde INTEGER," +
                                                "lehrer TEXT," +
-                                               "fach TEXT," +
                                                "vlehrer TEXT," +
                                                "vfach TEXT," +
                                                "raum TEXT," +

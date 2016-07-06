@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
-        String lehrer = pref.getString("lehrer", null); // Default: -1 -> Einstellungen aufrufen
-        if(lehrer != null)
+        int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
+        if(ks != -1)
             update(); // den Vertretungsplan abrufen
         else
             startActivityForResult(new Intent(this, SettingsActivity.class), 1);
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
                 VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
                 SQLiteDatabase db = openHelper.getReadableDatabase();
-                String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "fach", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
+                String[] projection = new String[] {"_id", "tag", "klasse", "stunde", "lehrer", "vlehrer", "vfach", "raum", "bemerkung"};
                 String selection = "klasse == 'all' OR (lehrer == '"+lehrer+"' OR vlehrer == '"+lehrer+"')";
                 String orderBy = "date(tag), stunde";
                 Cursor cursor = db.query(VertretungenOpenHelper.TABLE_NAME, projection, selection, null, null, null, orderBy, null);
@@ -185,7 +185,6 @@ public class MainActivity extends AppCompatActivity {
 
             int stunde = cursor.getInt(cursor.getColumnIndexOrThrow("stunde"));
             String lehrer = cursor.getString(cursor.getColumnIndexOrThrow("lehrer"));
-            String fach = cursor.getString(cursor.getColumnIndexOrThrow("fach"));
             String vfach = cursor.getString(cursor.getColumnIndexOrThrow("vfach"));
             String vlehrer = cursor.getString(cursor.getColumnIndexOrThrow("vlehrer"));
             String raum = cursor.getString(cursor.getColumnIndexOrThrow("raum"));
@@ -195,10 +194,10 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout pane = (LinearLayout)view.findViewById(R.id.vertretung_pane);
 
             if(stunde == 0) {
-                stundeV.setText(fach);
+                stundeV.setText(vlehrer);
                 klasseV.setText("");
             }else {
-                stundeV.setText(stunde+". Stunde ("+lehrer+" / "+fach+")");
+                stundeV.setText((stunde > 0 ? stunde+". Stunde ":"")+lehrer);
                 klasseV.setText(klasse);
             }
 
@@ -227,8 +226,6 @@ public class MainActivity extends AppCompatActivity {
                 lp.leftMargin = (int)(5 * getResources().getDisplayMetrics().density);
                 icon.setLayoutParams(lp);
             }
-
-            Log.i("MainActivity", stunde+", "+fach);
 
             ArrayList<String> vertretungListe = new ArrayList<>();
 

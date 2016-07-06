@@ -117,8 +117,7 @@ public class NotificationService extends IntentService {
             tagValues.put("tag", datum);
             tagValues.put("klasse", "all");
             tagValues.put("stunde", 0);
-            tagValues.put("fach", datumRaw);
-            tagValues.put("vlehrer", "");
+            tagValues.put("vlehrer", datumRaw);
             tagValues.put("vfach", "");
             tagValues.put("raum", "");
             tagValues.put("bemerkung", bitteBeachten);
@@ -137,14 +136,15 @@ public class NotificationService extends IntentService {
 
                 String klasse = children.get(2).ownText();
                 String stundeS = children.get(1).ownText();
-                int stundeI = Integer.parseInt(stundeS.substring(stundeS.indexOf(" ")+1, stundeS.indexOf(".")));
+                int stundeI = -1;
+                if(stundeS.contains("."))
+                    stundeI = Integer.parseInt(stundeS.substring(stundeS.indexOf(" ")+1, stundeS.indexOf(".")));
                 String lehrer = children.get(5).ownText();
                 String fach = "";
                 String vlehrer = children.get(0).ownText();
                 String vfach = children.get(3).ownText();
                 String raum = children.get(4).ownText();
                 String bemerkung = children.get(6).ownText();
-
                 if(klasse.equals("all") || (klasse.startsWith(""+(ks+5)) && klasse.contains(kb))) {
                     String[] projection = new String[] {};
                     String selection = "tag='" + datum + "' AND " +
@@ -168,7 +168,6 @@ public class NotificationService extends IntentService {
                 values.put("klasse", klasse);
                 values.put("stunde", stundeI);
                 values.put("lehrer", lehrer);
-                values.put("fach", fach);
                 values.put("vlehrer", vlehrer);
                 values.put("vfach", vfach);
                 values.put("raum", raum);

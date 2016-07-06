@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Vertretungsplan</string>
-    <string name="vp_url">http://www.gym-friedberg.de/extscripts/schueler/vertretungsplan/</string>
+    <string name="vp_url">http://www.gym-friedberg.de/extscripts/lehrer/Vertretungen-L.html</string>
     <string name="einstellungen">Einstellungen</string>
     <string name="klassenstufe">Klassenstufe</string>
     <string name="klassenbuchstabe">Klassenbuchstabe</string>
