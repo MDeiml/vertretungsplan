@@ -17,8 +17,6 @@ public class SettingsActivity extends AppCompatActivity {
 
     private SharedPreferences pref; // Einstellungen
     private EditText lehrer;
-    private EditText vlehrer;
-    // private CheckBox notifications;
     private EditText benutzername;
     private EditText passwort;
     private EditText url; 
@@ -30,20 +28,12 @@ public class SettingsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.settings_toolbar);
         setSupportActionBar(toolbar);
         pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE); // alte Einstellungen laden
-        String vlehrerS = pref.getString("lehrer_full", ""); // Default: 5A
         String lehrerS = pref.getString("lehrer", "");
-        boolean notificationsB = pref.getBoolean("notifications", true);
         String urlS = pref.getString("url", getResources().getString(R.string.vp_url));
 
         lehrer = (EditText)findViewById(R.id.lehrer);
         lehrer.setText(lehrerS);
-
-        vlehrer = (EditText)findViewById(R.id.lehrer_full);
-        vlehrer.setText(vlehrerS);
         
-        /* notifications = (CheckBox)findViewById(R.id.setting_notification);
-        notifications.setChecked(notificationsB); */
-
         benutzername = (EditText)findViewById(R.id.benutzername);
         passwort = (EditText)findViewById(R.id.passwort);
         url = (EditText)findViewById(R.id.url);
@@ -61,13 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void save() {
         String lehrerS = lehrer.getText().toString();
-        String vlehrerS = vlehrer.getText().toString();
         String urlS = url.getText().toString();
-        /* boolean not = notifications.isChecked();
-        if(not)
-            NotificationEventReceiver.setupAlarm(this, 15);
-        else
-            NotificationEventReceiver.stopAlarm(this); */
 
         SharedPreferences.Editor editor = pref.edit();
         String b = benutzername.getText().toString();
@@ -82,8 +66,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
         editor.putString("url", urlS);
         editor.putString("lehrer", lehrerS);
-        editor.putString("lehrer_full", vlehrerS);
-        // editor.putBoolean("notifications", not);
         editor.commit();
         // neue Einstellungen an MainActivity übergeben
         Intent intent = new Intent();

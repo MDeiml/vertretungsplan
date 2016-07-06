@@ -82,8 +82,7 @@ public class NotificationService extends IntentService {
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
         String url = pref.getString("url", getResources().getString(R.string.vp_url));
         String auth = pref.getString("auth", "");
-        int ks = pref.getInt("klassenstufe", 0);
-        String kb = pref.getString("klassenbuchstabe", "A");
+        String l = pref.getString("lehrer", "");
         VertretungenOpenHelper openHelper = new VertretungenOpenHelper(this);
         SQLiteDatabase db = openHelper.getWritableDatabase();
         // Alte Einträge markieren
@@ -140,18 +139,16 @@ public class NotificationService extends IntentService {
                 if(stundeS.contains("."))
                     stundeI = Integer.parseInt(stundeS.substring(stundeS.indexOf(" ")+1, stundeS.indexOf(".")));
                 String lehrer = children.get(5).ownText();
-                String fach = "";
                 String vlehrer = children.get(0).ownText();
                 String vfach = children.get(3).ownText();
                 String raum = children.get(4).ownText();
                 String bemerkung = children.get(6).ownText();
-                if(klasse.equals("all") || (klasse.startsWith(""+(ks+5)) && klasse.contains(kb))) {
+                if(klasse.equals("all") || (lehrer.trim().equals(l) || vlehrer.trim().equals(l))) {
                     String[] projection = new String[] {};
                     String selection = "tag='" + datum + "' AND " +
                         "klasse='" + klasse + "' AND " +
                         "stunde=" + stundeI + " AND " +
                         "lehrer='" + lehrer + "' AND " +
-                        "fach='" + fach + "' AND " +
                         "vlehrer='" + vlehrer + "' AND " +
                         "vfach='" + vfach + "' AND " +
                         "raum='" + raum + "' AND " +

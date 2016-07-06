@@ -61,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
-        int ks = pref.getInt("klassenstufe", -1); // Default: -1 -> Einstellungen aufrufen
-        if(ks != -1)
+        String lehrer = pref.getString("lehrer", null);
+        if(lehrer != null)
             update(); // den Vertretungsplan abrufen
         else
             startActivityForResult(new Intent(this, SettingsActivity.class), 1);
@@ -125,9 +125,7 @@ public class MainActivity extends AppCompatActivity {
                     refresh.setRefreshing(false);
                 }
             });
-        }else if(requestCode == 1)
-            startActivityForResult(new Intent(this, SettingsActivity.class), 2);
-        else {
+        }else {
             update();
             // NotificationEventReceiver.setupAlarm(this, 15);
         }
@@ -139,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
             try {
                 SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
                 String lehrer = pref.getString("lehrer", "");
-                String vlehrer = pref.getString("lehrer_full", "");
 
                 VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);
                 SQLiteDatabase db = openHelper.getReadableDatabase();
