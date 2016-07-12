@@ -22,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText benutzername;
     private EditText passwort;
     private EditText url; 
+    private CheckBox notifications;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,8 +62,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
         
-        /* notifications = (CheckBox)findViewById(R.id.setting_notification);
-        notifications.setChecked(notificationsB); */
+        notifications = (CheckBox)findViewById(R.id.notifications);
+        notifications.setChecked(notificationsB);
 
         benutzername = (EditText)findViewById(R.id.benutzername);
         passwort = (EditText)findViewById(R.id.passwort);
@@ -83,13 +84,12 @@ public class SettingsActivity extends AppCompatActivity {
         int ks = klassenstufe.getSelectedItemPosition();
         String kb = klassenbuchstabe.getText().toString();
         String urlS = url.getText().toString();
-        /* boolean not = notifications.isChecked();
-        if(not)
+        boolean not = notifications.isChecked();
+        /*if(not)
             NotificationEventReceiver.setupAlarm(this, 15);
         else
             NotificationEventReceiver.stopAlarm(this); */
-        SharedPreferences prefs = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
-
+        
         SharedPreferences.Editor editor = pref.edit();
         String b = benutzername.getText().toString();
         String p = passwort.getText().toString();
@@ -104,7 +104,7 @@ public class SettingsActivity extends AppCompatActivity {
         editor.putString("url", urlS);
         editor.putInt("klassenstufe", ks);
         editor.putString("klassenbuchstabe", kb.toUpperCase());
-        // editor.putBoolean("notifications", not);
+        editor.putBoolean("notifications", not);
         editor.commit();
         // neue Einstellungen an MainActivity übergeben
         Intent intent = new Intent();

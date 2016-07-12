@@ -91,6 +91,19 @@
           android:layout_width="fill_parent"
           android:layout_height="wrap_content"
           android:layout_margin="5dp">
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Notifications: " />
+          <CheckBox
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/notifications" />
+      </TableRow>
+      <TableRow
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_margin="5dp">
 
           <TextView
               android:layout_width="wrap_content"
