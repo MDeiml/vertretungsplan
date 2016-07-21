@@ -79,7 +79,7 @@ public class NotificationService extends IntentService {
     }
 
     private int updateVertretungen() throws IOException {
-        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.lehrer.Einstellungen", MODE_PRIVATE);
         String url = pref.getString("url", getResources().getString(R.string.vp_url));
         String auth = pref.getString("auth", "");
         String l = pref.getString("lehrer", "");
@@ -179,7 +179,7 @@ public class NotificationService extends IntentService {
     }
 
     private void startNotification(int newEntries) {
-        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.lehrer.Einstellungen", MODE_PRIVATE);
         newEntries += pref.getInt("newEntries", 0);
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         builder.setContentTitle("Neue Vertretung")
@@ -199,7 +199,7 @@ public class NotificationService extends IntentService {
     }
 
     private void deleteNotification() {
-        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.lehrer.Einstellungen", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt("newEntries", 0);
         editor.commit();

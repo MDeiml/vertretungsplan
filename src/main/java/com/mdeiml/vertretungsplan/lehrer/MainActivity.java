@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
+        SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.lehrer.Einstellungen",MODE_PRIVATE); // Einstellungen laden
         String lehrer = pref.getString("lehrer", null);
         if(lehrer != null)
             update(); // den Vertretungsplan abrufen
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         public Cursor doInBackground(Void... v) {
             try {
-                SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen",MODE_PRIVATE); // Einstellungen laden
+                SharedPreferences pref = getSharedPreferences("com.mdeiml.vertretungsplan.lehrer.Einstellungen",MODE_PRIVATE); // Einstellungen laden
                 String lehrer = pref.getString("lehrer", "");
 
                 VertretungenOpenHelper openHelper = new VertretungenOpenHelper(MainActivity.this);

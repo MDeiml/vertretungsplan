@@ -19,7 +19,7 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText lehrer;
     private EditText benutzername;
     private EditText passwort;
-    private EditText url; 
+    private EditText url;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,18 +27,18 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings);
         Toolbar toolbar = (Toolbar)findViewById(R.id.settings_toolbar);
         setSupportActionBar(toolbar);
-        pref = getSharedPreferences("com.mdeiml.vertretungsplan.Einstellungen", MODE_PRIVATE); // alte Einstellungen laden
+        pref = getSharedPreferences("com.mdeiml.vertretungsplan.lehrer.Einstellungen", MODE_PRIVATE); // alte Einstellungen laden
         String lehrerS = pref.getString("lehrer", "");
         String urlS = pref.getString("url", getResources().getString(R.string.vp_url));
 
         lehrer = (EditText)findViewById(R.id.lehrer);
         lehrer.setText(lehrerS);
-        
+
         benutzername = (EditText)findViewById(R.id.benutzername);
         passwort = (EditText)findViewById(R.id.passwort);
         url = (EditText)findViewById(R.id.url);
         url.setText(urlS);
-        
+
         Button ok = (Button)findViewById(R.id.einstellungen_ok);
         ok.setOnClickListener(new OnClickListener(){
             @Override
