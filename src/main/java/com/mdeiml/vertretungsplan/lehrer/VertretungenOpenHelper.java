@@ -1,4 +1,4 @@
-package com.mdeiml.vertretungsplan;
+package com.mdeiml.vertretungsplan.lehrer;
 
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;

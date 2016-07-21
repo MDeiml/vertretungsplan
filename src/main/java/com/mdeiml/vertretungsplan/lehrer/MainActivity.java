@@ -1,4 +1,4 @@
-package com.mdeiml.vertretungsplan;
+package com.mdeiml.vertretungsplan.lehrer;
 
 import android.app.Activity;
 import android.os.Bundle;
